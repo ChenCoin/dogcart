@@ -15,6 +15,9 @@ class GridData {
 
   int gameState = 0;
 
+  // 第几关
+  int level = 0;
+
   GridData() {
     for (int i = 0; i < row; i++) {
       List<int> list = [];
@@ -57,6 +60,7 @@ class GridData {
     var sameColors = findSameColors(color, dx, dy);
     if (sameColors.length >= 2) {
       blockGrids(sameColors);
+      score += sameColors.length * sameColors.length * 5;
     }
     print('onTap $dx $dy, num: ${sameColors.length}');
     return sameColors.length;

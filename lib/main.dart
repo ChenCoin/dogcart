@@ -68,22 +68,51 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
     // 宽度为屏幕宽度 - 40，特殊适配大屏
-    final double width = min(screenSize.width - 32, 400);
+    final double width = min(screenSize.width - 32, 422);
     double height = width / 10 * 16;
     return Scaffold(
       backgroundColor: Colors.white60,
-      body: Center(
+      body: Align(
+        alignment: Alignment.topCenter,
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
-            const Padding(
-              padding: EdgeInsets.all(8),
-              child: Text(''),
+            SizedBox(
+              width: width - 16,
+              height: 84,
+              child: Stack(
+                children: [
+                  if (data.gameState == 1) ...[
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        '第 ${data.level + 1} 关 ',
+                        style: const TextStyle(
+                          fontSize: 24,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: Text(
+                        '分数: ${data.score}',
+                        style: const TextStyle(
+                          fontSize: 24,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ),
+                    const Padding(padding: EdgeInsets.all(8)),
+                  ],
+                ],
+              ),
             ),
-            const Text(
-              'Start',
+            GameBoard(
+              data: data,
+              width: width,
+              callback: () => setState(() {}),
             ),
-            GameBoard(data: data),
             Padding(
               padding: const EdgeInsets.all(16),
               child: SizedBox(

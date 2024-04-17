@@ -8,7 +8,13 @@ class StarBoard extends StatefulWidget {
 
   final GridData data;
 
-  const StarBoard({super.key, required this.size, required this.data});
+  final void Function() callback;
+
+  const StarBoard(
+      {super.key,
+      required this.size,
+      required this.data,
+      required this.callback});
 
   @override
   State<StatefulWidget> createState() => _StarBoardState();
@@ -33,7 +39,8 @@ class _StarBoardState extends State<StarBoard> {
     double grid = widget.size.width / GridData.col;
     int score = widget.data.onTap((dx / grid).floor(), (dy / grid).floor());
     if (score >= 2) {
-      setState(() {});
+      // setState(() {});
+      widget.callback();
     }
   }
 }
