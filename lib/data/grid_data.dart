@@ -5,13 +5,15 @@ class GridData {
 
   static const int row = 12;
 
-  static const int gap = 4;
+  static const int gap = 5;
 
   List<List<int>> grids = [];
 
   int score = 0;
 
   int highestScore = 0;
+
+  int gameState = 0;
 
   GridData() {
     for (int i = 0; i < row; i++) {
