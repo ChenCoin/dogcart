@@ -8,7 +8,7 @@ class StarBoard extends StatefulWidget {
 
   final GridData data;
 
-  final void Function() callback;
+  final void Function(bool) callback;
 
   const StarBoard(
       {super.key,
@@ -39,8 +39,7 @@ class _StarBoardState extends State<StarBoard> {
     double grid = widget.size.width / GridData.col;
     int score = widget.data.onTap((dx / grid).floor(), (dy / grid).floor());
     if (score >= 2) {
-      // setState(() {});
-      widget.callback();
+      widget.callback(widget.data.checkIfGameFinish());
     }
   }
 }

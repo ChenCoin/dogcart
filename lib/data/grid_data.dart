@@ -143,6 +143,20 @@ class GridData {
     return list;
   }
 
+  bool checkIfGameFinish() {
+    for (int i = 0; i < row - 1; i++) {
+      for (int j = 0; j < col; j++) {
+        int colorNow = grids[i][j];
+        int colorRight = grids[i][j + 1];
+        int colorBtm = grids[i + 1][j];
+        if (colorNow == colorRight || colorNow == colorBtm) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
   // 颜色匹配
   int colorMap(int number) {
     switch (number) {

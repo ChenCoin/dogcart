@@ -8,7 +8,7 @@ class GameBoard extends StatefulWidget {
 
   final double width;
 
-  final void Function() callback;
+  final void Function(bool) callback;
 
   const GameBoard(
       {super.key,

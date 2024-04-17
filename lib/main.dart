@@ -64,6 +64,13 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  void _onStateChange(bool isFinish) {
+    if (isFinish) {
+
+    }
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
@@ -111,7 +118,7 @@ class _MyHomePageState extends State<MyHomePage> {
             GameBoard(
               data: data,
               width: width,
-              callback: () => setState(() {}),
+              callback: _onStateChange,
             ),
             Padding(
               padding: const EdgeInsets.all(16),
