@@ -3,7 +3,9 @@ import 'dart:math';
 class GridData {
   static const int col = 10;
 
-  static const int row = 10;
+  static const int row = 12;
+
+  static const int gap = 4;
 
   List<List<int>> grids = [];
 
@@ -40,51 +42,61 @@ class GridData {
     }
   }
 
+  double obtainGrid(double width) {
+    return (width - (GridData.gap * (GridData.col + 1))) / GridData.col;
+  }
+
+  double obtainHeight(double grid) {
+    return grid * GridData.row + GridData.gap * (GridData.row + 1);
+  }
+
   int onTap(int dx, int dy) {
-    print('onTap $dx $dy');
     int color = grids[dy][dx];
     var sameColors = findSameColors(color, dx, dy);
-    for (var point in sameColors) {
-      print('[${point.y}, ${point.x}]');
-    }
     if (sameColors.length >= 2) {
-      // 消除相同颜色的方块
-      for (var point in sameColors) {
-        grids[point.y][point.x] = 0;
+      blockGrids(sameColors);
+    }
+    print('onTap $dx $dy, num: ${sameColors.length}');
+    return sameColors.length;
+  }
+
+  // 相连的方块个数大于2，消除方块，并移动剩余方块
+  void blockGrids(List<Point> sameColors) {
+    // 消除相同颜色的方块
+    for (var point in sameColors) {
+      grids[point.y][point.x] = 0;
+    }
+    // 方块下落
+    for (int i = 0; i < col; i++) {
+      int blank = 0;
+      for (int j = row - 1; j >= 0; j--) {
+        if (blank > 0) {
+          grids[j + blank][i] = grids[j][i];
+        }
+        if (grids[j][i] == 0) {
+          blank++;
+        } else if (blank > 0) {
+          grids[j][i] = 0;
+        }
       }
-      // 方块下落
-      for (int i = 0; i < col; i++) {
-        int blank = 0;
-        for (int j = row - 1; j >= 0; j--) {
-          if (blank > 0) {
-            grids[j + blank][i] = grids[j][i];
-          }
-          if (grids[j][i] == 0) {
-            blank++;
-          } else if (blank > 0) {
+    }
+    // 方块左移
+    int blank = 0;
+    for (int i = 0; i < col; i++) {
+      if (grids[row - 1][i] == 0) {
+        blank++;
+      } else {
+        if (blank > 0) {
+          for (int j = 0; j < row; j++) {
+            grids[j][i - blank] = grids[j][i];
             grids[j][i] = 0;
           }
         }
       }
-      // 方块左移
-      int blank = 0;
-      for (int i = 0; i < col; i++) {
-        if (grids[row - 1][i] == 0) {
-          blank++;
-        } else {
-          if (blank > 0) {
-            for (int j = 0; j < row; j++) {
-              grids[j][i - blank] = grids[j][i];
-              grids[j][i] = 0;
-            }
-          }
-        }
-      }
     }
-    print('num: ${sameColors.length}');
-    return sameColors.length;
   }
 
+  // 查找与被点击格子相连的相同颜色的格子
   List<Point> findSameColors(int color, int dx, int dy) {
     List<Point> list = <Point>[];
     list.add(Point(dx, dy));
@@ -122,22 +134,22 @@ class GridData {
         list.add(right);
       }
     }
-
     return list;
   }
 
+  // 颜色匹配
   int colorMap(int number) {
     switch (number) {
       case 1:
-        return 0xFFFF1A48; // red
+        return 0xFFC70039; // red
       case 2:
-        return 0xFF1EB6FF; // blue
+        return 0xFF1E90FF; // blue
       case 3:
-        return 0xFFFEF721; // yellow
+        return 0xFFFFD700; // yellow
       case 4:
-        return 0xFFC61DFF; // purple
+        return 0xFFDA70D6; // purple
       case 5:
-        return 0xFF53EC3F; // green
+        return 0xFF4CAF50; // green
       default:
         return 0;
     }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../data/grid_data.dart';
+import 'shape_draw.dart';
 
 class StarBoard extends StatefulWidget {
   final Size size;
@@ -31,7 +32,6 @@ class _StarBoardState extends State<StarBoard> {
   void onTap(double dx, double dy) {
     double grid = widget.size.width / GridData.col;
     int score = widget.data.onTap((dx / grid).floor(), (dy / grid).floor());
-    widget.data.printGrids();
     if (score >= 2) {
       setState(() {});
     }
@@ -48,32 +48,43 @@ class _MyPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     var rect = Offset.zero & size;
+    // 背景填充灰色
     var thePaint = Paint()
       ..isAntiAlias = true
       ..style = PaintingStyle.fill
-      ..color = Colors.grey;
+      ..color = Colors.white;
     canvas.drawRect(rect, thePaint);
 
-    int p = 2;
+    // 绘制格子
     var gridPaint = Paint()
       ..isAntiAlias = true
       ..style = PaintingStyle.fill;
 
-    double grid = size.width / GridData.col;
+    var starPaint = Paint()
+      ..isAntiAlias = true
+      ..style = PaintingStyle.stroke
+      ..color = Colors.black12;
+
+    double grid = data.obtainGrid(width);
+    int gap = GridData.gap;
     for (int i = 0; i < GridData.row; i++) {
       for (int j = 0; j < GridData.col; j++) {
-        Color color = Color(data.grids[i][j]);
+        int color = data.grids[i][j];
+        if (color == 0) {
+          continue;
+        }
+        gridPaint.color = Color(color);
 
-        // 画小白块
-        var left = grid * j + p;
-        var top = grid * i + p;
-        var right = left + grid - p * 2;
-        var bottom = top + grid - p * 2;
-        var rect = Rect.fromLTRB(left, top, right, bottom);
-        gridPaint.color = color;
-        RRect whiteGrid =
-            RRect.fromRectAndRadius(rect, const Radius.circular(2));
-        canvas.drawRRect(whiteGrid, gridPaint);
+        // 画圆角方块
+        var left = grid * j + gap * (j + 1);
+        var top = grid * i + gap * (i + 1);
+        Path roundRect = drawSmoothRoundRect(left, top, grid, grid, 12);
+        canvas.drawPath(roundRect, gridPaint);
+
+        // 画五角星
+        Path path = drawStar(
+            grid / 2 - 2, grid / 4 - 2, left + grid / 2, top + grid / 2, 0);
+        canvas.drawPath(path, starPaint);
       }
     }
   }

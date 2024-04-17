@@ -20,11 +20,14 @@ class _GameBoardState extends State<GameBoard> {
 
   @override
   Widget build(BuildContext context) {
+    double width = 422;
+    double grid = data.obtainGrid(width);
+    double height = data.obtainHeight(grid);
     return SizedBox(
-      width: 400,
-      height: 400,
+      width: width,
+      height: height,
       child: StarBoard(
-        size: const Size(400, 400),
+        size: Size(width, height),
         data: data,
       ),
     );
