@@ -5,7 +5,7 @@ class GridData {
 
   static const int row = 12;
 
-  static const int gap = 5;
+  static const int gap = 9;
 
   List<List<int>> grids = [];
 

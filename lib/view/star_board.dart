@@ -48,12 +48,8 @@ class _MyPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     var rect = Offset.zero & size;
-    // 背景填充灰色
-    var thePaint = Paint()
-      ..isAntiAlias = true
-      ..style = PaintingStyle.fill
-      ..color = Colors.white;
-    canvas.drawRect(rect, thePaint);
+    double grid = data.obtainGrid(width);
+    drawBackground(canvas, rect, grid);
 
     // 绘制格子
     var gridPaint = Paint()
@@ -65,7 +61,6 @@ class _MyPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..color = Colors.black12;
 
-    double grid = data.obtainGrid(width);
     int gap = GridData.gap;
     for (int i = 0; i < GridData.row; i++) {
       for (int j = 0; j < GridData.col; j++) {
@@ -91,4 +86,27 @@ class _MyPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+
+  void drawBackground(Canvas canvas, Rect rect, double grid) {
+    var paint = Paint()
+      ..isAntiAlias = true
+      ..style = PaintingStyle.stroke
+      ..color = Colors.black12
+      ..strokeWidth = 1.0;
+
+    // 画横线
+    int floor = (GridData.gap / 2).floor();
+    for (int i = 0; i <= GridData.row; i++) {
+      double dy = rect.top + (grid + GridData.gap) * i + floor;
+      canvas.drawLine(Offset(rect.left + floor, dy),
+          Offset(rect.right - floor * 2 + 3, dy), paint);
+    }
+
+    // 画竖线
+    for (int i = 0; i <= GridData.col; i++) {
+      double dx = rect.left + (grid + GridData.gap) * i + floor;
+      canvas.drawLine(Offset(dx, rect.top + floor),
+          Offset(dx, rect.bottom - floor * 2 + 3), paint);
+    }
+  }
 }
