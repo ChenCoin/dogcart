@@ -56,6 +56,9 @@ class GridData {
   }
 
   int onTap(int dx, int dy) {
+    if (dy >= row || dx >= col) {
+      return 0;
+    }
     int color = grids[dy][dx];
     if (color == 0) {
       return 0;
@@ -150,6 +153,9 @@ class GridData {
     for (int i = 0; i < row - 1; i++) {
       for (int j = 0; j < col; j++) {
         int colorNow = grids[i][j];
+        if (colorNow == 0) {
+          continue;
+        }
         int colorRight = grids[i][j + 1];
         int colorBtm = grids[i + 1][j];
         if (colorNow == colorRight || colorNow == colorBtm) {
