@@ -5,7 +5,7 @@ class GridData {
 
   static const int row = 12;
 
-  static const int gap = 9;
+  static const int gap = 4;
 
   List<List<int>> grids = [];
 
@@ -33,7 +33,7 @@ class GridData {
     var random = Random();
     for (int i = 0; i < row; i++) {
       for (int j = 0; j < col; j++) {
-        grids[i][j] = colorMap(random.nextInt(5) + 1);
+        grids[i][j] = random.nextInt(5) + 1;
       }
     }
   }
@@ -155,24 +155,6 @@ class GridData {
       }
     }
     return true;
-  }
-
-  // 颜色匹配
-  int colorMap(int number) {
-    switch (number) {
-      case 1:
-        return 0xFFC70039; // red
-      case 2:
-        return 0xFF1E90FF; // blue
-      case 3:
-        return 0xFFFFD700; // yellow
-      case 4:
-        return 0xFFDA70D6; // purple
-      case 5:
-        return 0xFF4CAF50; // green
-      default:
-        return 0;
-    }
   }
 
   void printGrids() {

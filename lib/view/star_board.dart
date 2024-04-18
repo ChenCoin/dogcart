@@ -64,17 +64,17 @@ class _MyPainter extends CustomPainter {
 
     var starPaint = Paint()
       ..isAntiAlias = true
-      ..style = PaintingStyle.stroke
-      ..color = Colors.black12;
+      ..style = PaintingStyle.fill;
 
     int gap = GridData.gap;
     for (int i = 0; i < GridData.row; i++) {
       for (int j = 0; j < GridData.col; j++) {
-        int color = data.grids[i][j];
-        if (color == 0) {
+        int colorValue = data.grids[i][j];
+        if (colorValue == 0) {
           continue;
         }
-        gridPaint.color = Color(color);
+        (int, int) color = colorMap(colorValue);
+        gridPaint.color = Color(color.$1);
 
         // 画圆角方块
         var left = grid * j + gap * (j + 1);
@@ -84,7 +84,9 @@ class _MyPainter extends CustomPainter {
 
         // 画五角星
         Path path = drawStar(
-            grid / 2 - 2, grid / 4 - 2, left + grid / 2, top + grid / 2, 0);
+            grid / 2 - 2, grid / 4, left + grid / 2, top + grid / 2, 0);
+        canvas.drawShadow(path, const Color(0xFF808080), 3, false);
+        starPaint.color = Color(color.$1);
         canvas.drawPath(path, starPaint);
       }
     }
@@ -97,7 +99,7 @@ class _MyPainter extends CustomPainter {
     var paint = Paint()
       ..isAntiAlias = true
       ..style = PaintingStyle.stroke
-      ..color = Colors.black12
+      ..color = const Color(0xFFEAEAE8)
       ..strokeWidth = 1.0;
 
     // 画横线
@@ -113,6 +115,24 @@ class _MyPainter extends CustomPainter {
       double dx = rect.left + (grid + GridData.gap) * i + floor;
       canvas.drawLine(Offset(dx, rect.top + floor),
           Offset(dx, rect.bottom - floor * 2 + 3), paint);
+    }
+  }
+
+  // 颜色匹配
+  (int, int) colorMap(int number) {
+    switch (number) {
+      case 1:
+        return (0xFFC70039, 0xFFC7486F); // red
+      case 2:
+        return (0xFF1E90FF, 0xFF5BABFF); // blue
+      case 3:
+        return (0xFFFFD700, 0xFFFFEA86); // yellow
+      case 4:
+        return (0xFFDA70D6, 0xFFDA8DD4); // purple
+      case 5:
+        return (0xFF4CAF50, 0xFF62AF64); // green
+      default:
+        return (0, 0);
     }
   }
 }

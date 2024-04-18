@@ -16,8 +16,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       onGenerateTitle: (ctx) => '消灭星星',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.white60),
-        primaryColor: Colors.white60,
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFFFFCFC)),
+        primaryColor: const Color(0xFFFFFCFC),
         useMaterial3: true,
       ),
       home: const MyHomePage(),
@@ -64,10 +64,18 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  void _onStateChange(bool isFinish) {
-    if (isFinish) {
-
+  String _gameStateBtnLabel(BuildContext context) {
+    if (data.gameState == 1) {
+      return '结束';
     }
+    if (data.gameState == 2) {
+      return '再次挑战';
+    }
+    return '开始游戏';
+  }
+
+  void _onStateChange(bool isFinish) {
+    if (isFinish) {}
     setState(() {});
   }
 
@@ -75,23 +83,22 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
     // 宽度为屏幕宽度 - 40，特殊适配大屏
-    final double width = min(screenSize.width - 32, 422);
-    double height = width / 10 * 16;
+    final double width = min(screenSize.width - 12, 422);
     return Scaffold(
-      backgroundColor: Colors.white60,
+      backgroundColor: const Color(0xFFFAFAF8),
       body: Align(
         alignment: Alignment.topCenter,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
             SizedBox(
-              width: width - 16,
-              height: 84,
+              width: width - 12,
+              height: 72,
               child: Stack(
                 children: [
                   if (data.gameState == 1) ...[
                     Align(
-                      alignment: Alignment.centerLeft,
+                      alignment: Alignment.bottomLeft,
                       child: Text(
                         '第 ${data.level + 1} 关 ',
                         style: const TextStyle(
@@ -101,7 +108,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                     ),
                     Align(
-                      alignment: Alignment.centerRight,
+                      alignment: Alignment.bottomRight,
                       child: Text(
                         '分数: ${data.score}',
                         style: const TextStyle(
@@ -110,11 +117,16 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                       ),
                     ),
-                    const Padding(padding: EdgeInsets.all(8)),
+                  ] else ...[
+                    const Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Text('消除连在一起的相同颜色的星星。'),
+                    ),
                   ],
                 ],
               ),
             ),
+            const Padding(padding: EdgeInsets.all(4)),
             GameBoard(
               data: data,
               width: width,
@@ -128,7 +140,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: FilledButton(
                   onPressed: _onBtnTap,
                   child: Text(
-                    data.gameState != 1 ? '开始游戏' : '结束',
+                    _gameStateBtnLabel(context),
                     style: const TextStyle(fontSize: 18),
                   ),
                 ),
