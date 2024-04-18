@@ -16,8 +16,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       onGenerateTitle: (ctx) => '消灭星星',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFFFFCFC)),
-        primaryColor: const Color(0xFFFFFCFC),
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFFAFAF8)),
+        primaryColor: const Color(0xFFFAFAF8),
         useMaterial3: true,
       ),
       home: const MyHomePage(),

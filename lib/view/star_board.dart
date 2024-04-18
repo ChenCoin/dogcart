@@ -107,14 +107,14 @@ class _MyPainter extends CustomPainter {
     for (int i = 0; i <= GridData.row; i++) {
       double dy = rect.top + (grid + GridData.gap) * i + floor;
       canvas.drawLine(Offset(rect.left + floor, dy),
-          Offset(rect.right - floor * 2 + 3, dy), paint);
+          Offset(rect.right - floor * 2 + 2, dy), paint);
     }
 
     // 画竖线
     for (int i = 0; i <= GridData.col; i++) {
       double dx = rect.left + (grid + GridData.gap) * i + floor;
       canvas.drawLine(Offset(dx, rect.top + floor),
-          Offset(dx, rect.bottom - floor * 2 + 3), paint);
+          Offset(dx, rect.bottom - floor * 2 + 2), paint);
     }
   }
 
