@@ -57,6 +57,9 @@ class GridData {
 
   int onTap(int dx, int dy) {
     int color = grids[dy][dx];
+    if (color == 0) {
+      return 0;
+    }
     var sameColors = findSameColors(color, dx, dy);
     if (sameColors.length >= 2) {
       blockGrids(sameColors);
