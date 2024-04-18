@@ -74,7 +74,7 @@ class _MyPainter extends CustomPainter {
           continue;
         }
         (int, int) color = colorMap(colorValue);
-        gridPaint.color = Color(color.$1);
+        gridPaint.color = Color(color.$2);
 
         // 画圆角方块
         var left = grid * j + gap * (j + 1);
@@ -122,15 +122,15 @@ class _MyPainter extends CustomPainter {
   (int, int) colorMap(int number) {
     switch (number) {
       case 1:
-        return (0xFFC70039, 0xFFC7486F); // red
+        return (0xFFEC7062, 0xFFE74C3C); // red
       case 2:
-        return (0xFF1E90FF, 0xFF5BABFF); // blue
+        return (0xFF5CADE2, 0xFF5599C7); // blue
       case 3:
-        return (0xFFFFD700, 0xFFFFEA86); // yellow
+        return (0xFFF4CF40, 0xFFF5B041); // yellow
       case 4:
-        return (0xFFDA70D6, 0xFFDA8DD4); // purple
+        return (0xFFAF7AC4, 0xFFA569BD); // purple
       case 5:
-        return (0xFF4CAF50, 0xFF62AF64); // green
+        return (0xFF57D68C, 0xFF53BE80); // green
       default:
         return (0, 0);
     }
