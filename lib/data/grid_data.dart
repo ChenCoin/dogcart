@@ -1,22 +1,37 @@
 import 'dart:math';
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 class GridData {
   static const int col = 10;
 
-  static const int row = 12;
+  static const int row = 10;
 
   static const int gap = 4;
 
   List<List<int>> grids = [];
 
+  // 当前分数
   int score = 0;
 
+  // 最高分
   int highestScore = 0;
 
-  int gameState = 0;
+  // 本局得分
+  int scoreLevel = 0;
 
   // 第几关
   int level = 0;
+
+  // 本局目标分数
+  int goal = 0;
+
+  // 临时调试
+  var goals = <int>[1000, 2500, 4500, 7000];
+
+  // 游戏状态，0为初始进入游戏，1为游戏中，2为游戏结束，3为游戏中等待下一关，4为游戏结算画面
+  // 状态2已不再使用
+  int gameState = 0;
 
   GridData() {
     for (int i = 0; i < row; i++) {
@@ -28,8 +43,57 @@ class GridData {
     }
   }
 
+  void init() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    highestScore = prefs.getInt('highestScore') ?? 0;
+  }
+
+  void storeData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setInt('highestScore', highestScore);
+  }
+
   void start() {
+    gameState = 1;
     score = 0;
+    scoreLevel = 0;
+    level = 0;
+    goal = goals[level];
+    fillGrids();
+  }
+
+  void end() async {
+    gameState = 4;
+    highestScore = max(score, highestScore);
+    clearGrids();
+    storeData();
+  }
+
+  void nextLevel() {
+    gameState = 1;
+    level++;
+    goal = queryLevelGoal(level);
+    scoreLevel = 0;
+    fillGrids();
+  }
+
+  void onLevelFinish() {
+    var starCount = queryStarLast();
+    if (starCount < 10) {
+      var scoreMore = 2000 - starCount * starCount * 20;
+      scoreLevel += scoreMore;
+      score += scoreMore;
+    }
+    if (score >= queryLevelGoal(level)) {
+      gameState = 3;
+    } else {
+      gameState = 4;
+      highestScore = max(score, highestScore);
+      storeData();
+    }
+  }
+
+  void fillGrids() {
     var random = Random();
     for (int i = 0; i < row; i++) {
       for (int j = 0; j < col; j++) {
@@ -38,13 +102,35 @@ class GridData {
     }
   }
 
-  void end() async {
-    score = 0;
+  void clearGrids() {
     for (int i = 0; i < row; i++) {
       for (int j = 0; j < col; j++) {
         grids[i][j] = 0;
       }
     }
+  }
+
+  int queryLevelGoal(int level) {
+    if (level >= goals.length) {
+      return goals.last + 3000 * (level - goals.length - 1);
+    }
+    return goals[level];
+  }
+
+  int queryGoalNextLevel() {
+    return queryLevelGoal(level + 1);
+  }
+
+  bool isGameRunning() {
+    return gameState == 1 || gameState == 3;
+  }
+
+  bool isGameSettlement() {
+    return gameState == 3 || gameState == 4;
+  }
+
+  bool isGameWillNextLevel() {
+    return gameState == 3;
   }
 
   double obtainGrid(double width) {
@@ -66,7 +152,9 @@ class GridData {
     var sameColors = findSameColors(color, dx, dy);
     if (sameColors.length >= 2) {
       blockGrids(sameColors);
-      score += sameColors.length * sameColors.length * 5;
+      var value = sameColors.length * sameColors.length * 5;
+      scoreLevel += value;
+      score += value;
     }
     print('onTap $dx $dy, num: ${sameColors.length}');
     return sameColors.length;
@@ -150,20 +238,39 @@ class GridData {
   }
 
   bool checkIfGameFinish() {
-    for (int i = 0; i < row - 1; i++) {
+    for (int i = 0; i < row; i++) {
       for (int j = 0; j < col; j++) {
         int colorNow = grids[i][j];
         if (colorNow == 0) {
           continue;
         }
-        int colorRight = grids[i][j + 1];
-        int colorBtm = grids[i + 1][j];
-        if (colorNow == colorRight || colorNow == colorBtm) {
-          return false;
+        if (j != col - 1) {
+          int colorRight = grids[i][j + 1];
+          if (colorNow == colorRight) {
+            return false;
+          }
+        }
+        if (i != row - 1) {
+          int colorBtm = grids[i + 1][j];
+          if (colorNow == colorBtm) {
+            return false;
+          }
         }
       }
     }
     return true;
+  }
+
+  int queryStarLast() {
+    int count = 0;
+    for (int i = 0; i < row; i++) {
+      for (int j = 0; j < col; j++) {
+        if (grids[i][j] != 0) {
+          count++;
+        }
+      }
+    }
+    return count;
   }
 
   void printGrids() {

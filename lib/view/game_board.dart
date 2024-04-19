@@ -1,6 +1,5 @@
-import 'package:dogcart/data/grid_data.dart';
 import 'package:flutter/material.dart';
-
+import '../data/grid_data.dart';
 import 'star_board.dart';
 
 class GameBoard extends StatefulWidget {
