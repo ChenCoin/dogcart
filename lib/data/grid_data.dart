@@ -27,7 +27,7 @@ class GridData {
   int goal = 0;
 
   // 临时调试
-  var goals = <int>[1000, 2500, 4500, 7000];
+  var goals = <int>[1000, 2500, 4000, 5500, 7500, 9000, 11000, 13500, 16500, 20500, 24000];
 
   // 游戏状态，0为初始进入游戏，1为游戏中，2为游戏结束，3为游戏中等待下一关，4为游戏结算画面
   // 状态2已不再使用
@@ -112,7 +112,7 @@ class GridData {
 
   int queryLevelGoal(int level) {
     if (level >= goals.length) {
-      return goals.last + 3000 * (level - goals.length - 1);
+      return goals.last + 3000 * (level - goals.length + 1);
     }
     return goals[level];
   }

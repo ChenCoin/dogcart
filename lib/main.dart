@@ -21,6 +21,7 @@ class MyApp extends StatelessWidget {
         primaryColor: const Color(0xFFFAFAF8),
         useMaterial3: true,
       ),
+      supportedLocales: const [Locale("zh", "CN"), Locale("en", "US")],
       home: const MyHomePage(),
     );
   }
@@ -111,18 +112,23 @@ class _MyHomePageState extends State<MyHomePage> {
         if (data.isGameRunning()) ...[
           Align(
             alignment: Alignment.bottomLeft,
-            child: Text(
-              '分数: ${data.score}',
-              style: const TextStyle(
-                fontSize: 18,
-                color: Colors.black87,
-              ),
-            ),
+            child: Text.rich(TextSpan(
+              children: [
+                const TextSpan(
+                  text: "分数: ",
+                  style: TextStyle(color: Colors.black87, fontSize: 18),
+                ),
+                TextSpan(
+                  text: "${data.score}",
+                  style: const TextStyle(color: Colors.amber, fontSize: 20),
+                )
+              ],
+            )),
           ),
           Align(
             alignment: Alignment.bottomRight,
             child: Text(
-              '第 ${data.level + 1} 关 目标: ${data.goal}',
+              '关卡: ${data.level + 1}  目标: ${data.goal}',
               style: const TextStyle(
                 fontSize: 18,
                 color: Colors.black87,

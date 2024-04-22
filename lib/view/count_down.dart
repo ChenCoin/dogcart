@@ -25,7 +25,7 @@ class _TimerTextState extends State<TimerText> {
 
   @override
   Widget build(BuildContext context) {
-    return Text('$secondCount秒后进入下一关');
+    return Text('$secondCount 秒后进入下一关');
   }
 
   @override
