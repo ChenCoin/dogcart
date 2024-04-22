@@ -45,12 +45,12 @@ class GridData {
 
   void init() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    highestScore = prefs.getInt('highestScore') ?? 0;
+    highestScore = prefs.getInt('dogcart.highestScore') ?? 0;
   }
 
   void storeData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setInt('highestScore', highestScore);
+    prefs.setInt('dogcart.highestScore', highestScore);
   }
 
   void start() {
