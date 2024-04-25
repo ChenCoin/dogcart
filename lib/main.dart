@@ -1,11 +1,13 @@
 import 'dart:math';
 
-import 'package:dogcart/data/grid_data.dart';
-import 'package:dogcart/view/game_board.dart';
-import 'package:dogcart/view/level_board.dart';
 import 'package:flutter/material.dart';
+import 'data/grid_data.dart';
+import 'view/game_board.dart';
+import 'view/level_board.dart';
+import 'web/conf_nil.dart' if (dart.library.html) 'web/conf_web.dart';
 
 void main() {
+  webConfigure();
   runApp(const MyApp());
 }
 
