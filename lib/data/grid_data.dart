@@ -29,6 +29,12 @@ class GridData {
   // 本局目标分数
   int goal = 0;
 
+  // 打破星星的动画列表
+  List<BreakStarList> breakStarList = <BreakStarList>[];
+
+  // 动画函数
+  void Function(List<ColorPoint>) breakFn = (arg) {};
+
   // 临时调试
   var goals = <int>[
     1000,
@@ -82,6 +88,20 @@ class GridData {
     highestScore = max(score, highestScore);
     clearGrids();
     storeData();
+  }
+
+  void onViewInit(void Function(List<ColorPoint>) breakFn) {
+    this.breakFn = breakFn;
+  }
+
+  void onDispose() {}
+
+  void addBreakStarList(BreakStarList list) {
+    breakStarList.add(list);
+  }
+
+  void removeBreakStarList(BreakStarList list) {
+    breakStarList.remove(list);
   }
 
   void nextLevel() {
@@ -164,12 +184,14 @@ class GridData {
     if (starGrid.isEmpty()) {
       return 0;
     }
-    var sameColors = findSameColors(starGrid, dx, dy);
+    var sameColors = findSameColors(starGrid, dx, dy, starGrid.getColorValue());
     if (sameColors.length >= 2) {
       blockGrids(sameColors);
       var value = sameColors.length * sameColors.length * 5;
       scoreLevel += value;
       score += value;
+      // 创建动画
+      breakFn(sameColors);
     }
     debugPrint('onTap $dx $dy, num: ${sameColors.length}');
     return sameColors.length;
@@ -249,9 +271,10 @@ class GridData {
   }
 
   // 查找与被点击格子相连的相同颜色的格子
-  List<Point> findSameColors(StarGrid starGrid, int dx, int dy) {
-    List<Point> list = <Point>[];
-    list.add(Point(dx, dy));
+  List<ColorPoint> findSameColors(
+      StarGrid starGrid, int dx, int dy, int color) {
+    List<ColorPoint> list = <ColorPoint>[];
+    list.add(ColorPoint(dx, dy, color));
     isNewPoint(Point point) {
       if (!grids[point.y][point.x].isSameColor(starGrid)) {
         return false;
@@ -269,19 +292,19 @@ class GridData {
     while (index < list.length) {
       var now = list[index];
       index++;
-      var top = Point(now.x, now.y - 1);
+      var top = ColorPoint(now.x, now.y - 1, color);
       if (top.y >= 0 && isNewPoint(top)) {
         list.add(top);
       }
-      var bottom = Point(now.x, now.y + 1);
+      var bottom = ColorPoint(now.x, now.y + 1, color);
       if (bottom.y < row && isNewPoint(bottom)) {
         list.add(bottom);
       }
-      var left = Point(now.x - 1, now.y);
+      var left = ColorPoint(now.x - 1, now.y, color);
       if (left.x >= 0 && isNewPoint(left)) {
         list.add(left);
       }
-      var right = Point(now.x + 1, now.y);
+      var right = ColorPoint(now.x + 1, now.y, color);
       if (right.x < col && isNewPoint(right)) {
         list.add(right);
       }

@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class Point {
   final int x;
   final int y;
@@ -11,6 +13,24 @@ class Point {
 
   @override
   int get hashCode => x * x + y * y + y;
+}
+
+class ColorPoint extends Point {
+  int value;
+
+  (int, int) color = (0, 0);
+
+  ColorPoint(super.x, super.y, this.value) {
+    color = _colorMap(value);
+  }
+}
+
+class BreakStarList {
+  List<ColorPoint> list;
+
+  Animation<double> anim;
+
+  BreakStarList(this.list, this.anim);
 }
 
 class MovingPoint {
@@ -72,21 +92,25 @@ class StarGrid {
     _movingState = false;
   }
 
-  // 颜色匹配
-  (int, int) _colorMap(int number) {
-    switch (number) {
-      case 1:
-        return (0xFFEC7062, 0xFFE74C3C); // red
-      case 2:
-        return (0xFF5CADE2, 0xFF5599C7); // blue
-      case 3:
-        return (0xFFF4CF40, 0xFFF5B041); // yellow
-      case 4:
-        return (0xFFAF7AC4, 0xFFA569BD); // purple
-      case 5:
-        return (0xFF57D68C, 0xFF53BE80); // green
-      default:
-        return (0, 0);
-    }
+  int getColorValue() {
+    return _value;
+  }
+}
+
+// 颜色匹配
+(int, int) _colorMap(int number) {
+  switch (number) {
+    case 1:
+      return (0xFFEC7062, 0xFFE74C3C); // red
+    case 2:
+      return (0xFF5CADE2, 0xFF5599C7); // blue
+    case 3:
+      return (0xFFF4CF40, 0xFFF5B041); // yellow
+    case 4:
+      return (0xFFAF7AC4, 0xFFA569BD); // purple
+    case 5:
+      return (0xFF57D68C, 0xFF53BE80); // green
+    default:
+      return (0, 0);
   }
 }
