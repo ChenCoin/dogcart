@@ -51,7 +51,7 @@ class _EffectBoardState extends State<EffectBoard>
     var controller = AnimationController(duration: duration, vsync: this);
     // animation用于获取数值
     var curve = CurvedAnimation(parent: controller, curve: Curves.easeOutQuad);
-    Animation<double> anim = Tween(begin: 0.0, end: 100.0).animate(curve)
+    Animation<double> anim = Tween(begin: 100.0, end: 0.0).animate(curve)
       ..addListener(() => setState(() {}));
     var breakStars = BreakStarList(list, anim);
     controller.addStatusListener((status) {
@@ -88,16 +88,15 @@ class _MyPainter extends CustomPainter {
       var animValue = item.anim.value;
       List<ColorPoint> list = item.list;
       for (var colorPoint in list) {
-
         int i = colorPoint.y;
         int j = colorPoint.x;
         // 画圆角方块
         var left = grid * j + gap * (j + 1);
         var top = grid * i + gap * (i + 1);
-
+        double R = (grid / 2 - 2) * animValue / 100;
+        double r = (grid / 4) * animValue / 100;
         // 画五角星
-        Path path = drawStar(
-            grid / 2 - 2, grid / 4, left + grid / 2, top + grid / 2, 0);
+        Path path = drawStar(R, r, left + grid / 2, top + grid / 2, 0);
         canvas.drawShadow(path, const Color(0xFF808080), 3, false);
         starPaint.color = Color(colorPoint.color.$1);
         canvas.drawPath(path, starPaint);
