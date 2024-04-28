@@ -20,13 +20,6 @@ class BreakStarList {
   BreakStarList(this.list, this.anim);
 }
 
-class MovingPoint {
-  Point<int> src;
-  Point<int> target;
-
-  MovingPoint(this.src, this.target);
-}
-
 class StarGrid {
   int _value = 0;
 
@@ -65,14 +58,13 @@ class StarGrid {
   }
 
   Point<double> calcPosition(StarGrid one) {
+    var pos = one.position;
     if (one.anim == null) {
-      return one.position;
+      return pos;
     }
     double animValue = one.anim!.value;
-    double dx =
-        one.position.x + (one.target.x - one.position.x) * animValue / 100;
-    double dy =
-        one.position.y + (one.target.y - one.position.y) * animValue / 100;
+    double dx = pos.x + (one.target.x - pos.x) * animValue / 100;
+    double dy = pos.y + (one.target.y - pos.y) * animValue / 100;
     return Point(dx, dy);
   }
 
@@ -119,24 +111,6 @@ class StarGrid {
   int getColorValue() {
     return _value;
   }
-}
-
-class MovingStar {
-  Point<double> src;
-
-  Point<double> target;
-
-  StarGrid grid;
-
-  MovingStar(this.src, this.target, this.grid);
-}
-
-class MovingStarList {
-  List<MovingStar> list;
-
-  Animation<double> anim;
-
-  MovingStarList(this.list, this.anim);
 }
 
 // 颜色匹配

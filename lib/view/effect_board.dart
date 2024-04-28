@@ -47,7 +47,7 @@ class _EffectBoardState extends State<EffectBoard>
   }
 
   void createBreakStar(List<ColorPoint> list) {
-    Duration duration = const Duration(milliseconds: 8000);
+    Duration duration = const Duration(milliseconds: 800);
     var controller = AnimationController(duration: duration, vsync: this);
     // animation用于获取数值
     var curve = CurvedAnimation(parent: controller, curve: Curves.easeOutQuad);
@@ -66,7 +66,7 @@ class _EffectBoardState extends State<EffectBoard>
   }
 
   void createMovingStar(List<StarGrid> list) {
-    Duration duration = const Duration(milliseconds: 8000);
+    Duration duration = const Duration(milliseconds: 800);
     var controller = AnimationController(duration: duration, vsync: this);
     // animation用于获取数值
     var curve = CurvedAnimation(parent: controller, curve: Curves.easeOutQuad);

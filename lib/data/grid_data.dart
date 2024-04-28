@@ -32,9 +32,6 @@ class GridData {
   // 打破星星的动画列表
   List<BreakStarList> breakStarList = <BreakStarList>[];
 
-  // 移动位置的星星列表
-  List<MovingStarList> movingStarList = <MovingStarList>[];
-
   // 打破星星动画函数
   void Function(List<ColorPoint>) breakFn = (arg) {};
 
@@ -111,14 +108,6 @@ class GridData {
 
   void removeBreakStarList(BreakStarList list) {
     breakStarList.remove(list);
-  }
-
-  void addMovingStarList(MovingStarList list) {
-    movingStarList.add(list);
-  }
-
-  void removeMovingStarList(MovingStarList list) {
-    movingStarList.remove(list);
   }
 
   void nextLevel() {
