@@ -92,6 +92,7 @@ class GridData {
     highestScore = max(score, highestScore);
     clearGrids();
     storeData();
+    onDispose();
   }
 
   void onViewInit(void Function(List<ColorPoint>) breakFn,
@@ -100,7 +101,11 @@ class GridData {
     this.movingFn = movingFn;
   }
 
-  void onDispose() {}
+  void onDispose() {
+    breakFn = (arg) {};
+    movingFn = (arg) {};
+    breakStarList.clear();
+  }
 
   void addBreakStarList(BreakStarList list) {
     breakStarList.add(list);
@@ -247,8 +252,9 @@ class GridData {
         }
       }
     }
-    for(var item in starWillMove){
-      debugPrint('move [${item.position.x}, ${item.position.y}] -> [${item.target.x}, ${item.target.y}]');
+    for (var item in starWillMove) {
+      debugPrint(
+          'move [${item.position.x}, ${item.position.y}] -> [${item.target.x}, ${item.target.y}]');
     }
     movingFn(starWillMove);
   }
