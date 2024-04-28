@@ -1,21 +1,8 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
-class Point {
-  final int x;
-  final int y;
-
-  Point(this.x, this.y);
-
-  @override
-  bool operator ==(Object other) {
-    return other is Point && x == other.x && y == other.y;
-  }
-
-  @override
-  int get hashCode => x * x + y * y + y;
-}
-
-class ColorPoint extends Point {
+class ColorPoint extends Point<int> {
   int value;
 
   (int, int) color = (0, 0);
@@ -34,8 +21,8 @@ class BreakStarList {
 }
 
 class MovingPoint {
-  Point src;
-  Point target;
+  Point<int> src;
+  Point<int> target;
 
   MovingPoint(this.src, this.target);
 }
@@ -80,7 +67,7 @@ class StarGrid {
     return _movingState;
   }
 
-  void willMove(Point src) {
+  void willMove(Point<int> src) {
     _movingState = true;
   }
 
@@ -95,6 +82,24 @@ class StarGrid {
   int getColorValue() {
     return _value;
   }
+}
+
+class MovingStar {
+  Point<double> src;
+
+  Point<double> target;
+
+  StarGrid grid;
+
+  MovingStar(this.src, this.target, this.grid);
+}
+
+class MovingStarList {
+  List<MovingStar> list;
+
+  Animation<double> anim;
+
+  MovingStarList(this.list, this.anim);
 }
 
 // 颜色匹配

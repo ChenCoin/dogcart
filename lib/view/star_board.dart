@@ -70,7 +70,7 @@ class _MyPainter extends CustomPainter {
     for (int i = 0; i < GridData.row; i++) {
       for (int j = 0; j < GridData.col; j++) {
         var gridPoint = data.grids[i][j];
-        if (gridPoint.isEmpty()) {
+        if (gridPoint.isEmpty() || gridPoint.isMoving()) {
           continue;
         }
         (int, int) color = gridPoint.color;

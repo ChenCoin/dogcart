@@ -32,8 +32,14 @@ class GridData {
   // 打破星星的动画列表
   List<BreakStarList> breakStarList = <BreakStarList>[];
 
-  // 动画函数
+  // 移动位置的星星列表
+  List<MovingStarList> movingStarList = <MovingStarList>[];
+
+  // 打破星星动画函数
   void Function(List<ColorPoint>) breakFn = (arg) {};
+
+  // 移动星星动画函数
+  void Function(List<MovingStar>) movingFn = (arg) {};
 
   // 临时调试
   var goals = <int>[
@@ -90,8 +96,10 @@ class GridData {
     storeData();
   }
 
-  void onViewInit(void Function(List<ColorPoint>) breakFn) {
+  void onViewInit(void Function(List<ColorPoint>) breakFn,
+      void Function(List<MovingStar>) movingFn) {
     this.breakFn = breakFn;
+    this.movingFn = movingFn;
   }
 
   void onDispose() {}
@@ -102,6 +110,14 @@ class GridData {
 
   void removeBreakStarList(BreakStarList list) {
     breakStarList.remove(list);
+  }
+
+  void addMovingStarList(MovingStarList list) {
+    movingStarList.add(list);
+  }
+
+  void removeMovingStarList(MovingStarList list) {
+    movingStarList.remove(list);
   }
 
   void nextLevel() {
@@ -186,19 +202,19 @@ class GridData {
     }
     var sameColors = findSameColors(starGrid, dx, dy, starGrid.getColorValue());
     if (sameColors.length >= 2) {
+      // 创建动画
+      breakFn(sameColors);
       blockGrids(sameColors);
       var value = sameColors.length * sameColors.length * 5;
       scoreLevel += value;
       score += value;
-      // 创建动画
-      breakFn(sameColors);
     }
     debugPrint('onTap $dx $dy, num: ${sameColors.length}');
     return sameColors.length;
   }
 
   // 相连的方块个数大于2，消除方块，并移动剩余方块
-  void blockGrids(List<Point> sameColors) {
+  void blockGrids(List<Point<int>> sameColors) {
     List<MovingPoint> fallList = <MovingPoint>[];
     List<MovingPoint> leftMovingList = <MovingPoint>[];
     List<MovingPoint> result = <MovingPoint>[];
@@ -218,7 +234,7 @@ class GridData {
           grids[j + blank][i].clone(grids[j][i]);
           grids[j][i].clear();
           // [j, i] -> [j + blank, i]
-          fallList.add(MovingPoint(Point(i, j), Point(i, j + blank)));
+          fallList.add(MovingPoint(Point<int>(i, j), Point<int>(i, j + blank)));
         }
       }
     }
@@ -237,7 +253,8 @@ class GridData {
           grids[j][i - blank].clone(grids[j][i]);
           grids[j][i].clear();
           // [j, i] -> [j, i - blank]
-          leftMovingList.add(MovingPoint(Point(i, j), Point(i - blank, j)));
+          leftMovingList
+              .add(MovingPoint(Point<int>(i, j), Point<int>(i - blank, j)));
         }
       }
     }
@@ -268,6 +285,12 @@ class GridData {
           '[${point.target.x}, ${point.target.y}]');
       grids[point.target.y][point.target.x].willMove(point.src);
     }
+    movingFn(result.map((e) {
+      StarGrid grid = grids[e.target.y][e.target.x];
+      var src = Point<double>(e.src.x.toDouble(), e.src.y.toDouble());
+      var target = Point<double>(e.target.x.toDouble(), e.target.y.toDouble());
+      return MovingStar(src, target, grid);
+    }).toList());
   }
 
   // 查找与被点击格子相连的相同颜色的格子
@@ -275,7 +298,7 @@ class GridData {
       StarGrid starGrid, int dx, int dy, int color) {
     List<ColorPoint> list = <ColorPoint>[];
     list.add(ColorPoint(dx, dy, color));
-    isNewPoint(Point point) {
+    isNewPoint(Point<int> point) {
       if (!grids[point.y][point.x].isSameColor(starGrid)) {
         return false;
       }
