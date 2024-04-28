@@ -34,10 +34,13 @@ class _GameBoardState extends State<GameBoard> {
           data: data,
           callback: widget.callback,
         ),
-        EffectBoard(
-          size: Size(width, height),
-          data: data,
-        )
+        Offstage(
+          offstage: data.gameState != 1,
+          child: EffectBoard(
+            size: Size(width, height),
+            data: data,
+          ),
+        ),
       ],
     );
   }
