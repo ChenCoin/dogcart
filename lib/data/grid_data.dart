@@ -1,6 +1,9 @@
 import 'dart:math';
 
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'grid_point.dart';
 
 class GridData {
   static const int col = 10;
@@ -9,7 +12,7 @@ class GridData {
 
   static const int gap = 4;
 
-  List<List<int>> grids = [];
+  List<List<StarGrid>> grids = [];
 
   // 当前分数
   int score = 0;
@@ -27,7 +30,19 @@ class GridData {
   int goal = 0;
 
   // 临时调试
-  var goals = <int>[1000, 2500, 4000, 5500, 7500, 9000, 11000, 13500, 16500, 20500, 24000];
+  var goals = <int>[
+    1000,
+    2500,
+    4000,
+    5500,
+    7500,
+    9000,
+    11000,
+    13500,
+    16500,
+    20500,
+    24000
+  ];
 
   // 游戏状态，0为初始进入游戏，1为游戏中，2为游戏结束，3为游戏中等待下一关，4为游戏结算画面
   // 状态2已不再使用
@@ -35,9 +50,9 @@ class GridData {
 
   GridData() {
     for (int i = 0; i < row; i++) {
-      List<int> list = [];
+      List<StarGrid> list = [];
       for (int j = 0; j < col; j++) {
-        list.add(0);
+        list.add(StarGrid());
       }
       grids.add(list);
     }
@@ -97,7 +112,7 @@ class GridData {
     var random = Random();
     for (int i = 0; i < row; i++) {
       for (int j = 0; j < col; j++) {
-        grids[i][j] = random.nextInt(5) + 1;
+        grids[i][j].setValue(random.nextInt(5) + 1);
       }
     }
   }
@@ -105,7 +120,7 @@ class GridData {
   void clearGrids() {
     for (int i = 0; i < row; i++) {
       for (int j = 0; j < col; j++) {
-        grids[i][j] = 0;
+        grids[i][j].clear();
       }
     }
   }
@@ -145,63 +160,100 @@ class GridData {
     if (dy >= row || dx >= col) {
       return 0;
     }
-    int color = grids[dy][dx];
-    if (color == 0) {
+    var starGrid = grids[dy][dx];
+    if (starGrid.isEmpty()) {
       return 0;
     }
-    var sameColors = findSameColors(color, dx, dy);
+    var sameColors = findSameColors(starGrid, dx, dy);
     if (sameColors.length >= 2) {
       blockGrids(sameColors);
       var value = sameColors.length * sameColors.length * 5;
       scoreLevel += value;
       score += value;
     }
-    print('onTap $dx $dy, num: ${sameColors.length}');
+    debugPrint('onTap $dx $dy, num: ${sameColors.length}');
     return sameColors.length;
   }
 
   // 相连的方块个数大于2，消除方块，并移动剩余方块
   void blockGrids(List<Point> sameColors) {
+    List<MovingPoint> fallList = <MovingPoint>[];
+    List<MovingPoint> leftMovingList = <MovingPoint>[];
+    List<MovingPoint> result = <MovingPoint>[];
     // 消除相同颜色的方块
     for (var point in sameColors) {
-      grids[point.y][point.x] = 0;
+      grids[point.y][point.x].clear();
     }
     // 方块下落
     for (int i = 0; i < col; i++) {
       int blank = 0;
       for (int j = row - 1; j >= 0; j--) {
-        if (blank > 0) {
-          grids[j + blank][i] = grids[j][i];
-        }
-        if (grids[j][i] == 0) {
+        if (grids[j][i].isEmpty()) {
           blank++;
-        } else if (blank > 0) {
-          grids[j][i] = 0;
+          continue;
+        }
+        if (blank > 0) {
+          grids[j + blank][i].clone(grids[j][i]);
+          grids[j][i].clear();
+          // [j, i] -> [j + blank, i]
+          fallList.add(MovingPoint(Point(i, j), Point(i, j + blank)));
         }
       }
     }
     // 方块左移
     int blank = 0;
     for (int i = 0; i < col; i++) {
-      if (grids[row - 1][i] == 0) {
+      if (grids[row - 1][i].isEmpty()) {
         blank++;
-      } else {
-        if (blank > 0) {
-          for (int j = 0; j < row; j++) {
-            grids[j][i - blank] = grids[j][i];
-            grids[j][i] = 0;
+        continue;
+      }
+      if (blank > 0) {
+        for (int j = 0; j < row; j++) {
+          if (grids[j][i].isEmpty()) {
+            continue;
           }
+          grids[j][i - blank].clone(grids[j][i]);
+          grids[j][i].clear();
+          // [j, i] -> [j, i - blank]
+          leftMovingList.add(MovingPoint(Point(i, j), Point(i - blank, j)));
         }
       }
+    }
+    // 将下落和左移的点汇总
+    for (int i = 0; i < fallList.length; i++) {
+      MovingPoint fallPoint = fallList[i];
+      bool findMergePoint = false;
+      for (int j = 0; j < leftMovingList.length; j++) {
+        MovingPoint leftPoint = leftMovingList[j];
+        // 下落点的终点和左移点的起点是一样，则合并这2个点
+        if (fallPoint.target == leftPoint.src) {
+          findMergePoint = true;
+          result.add(MovingPoint(fallPoint.src, leftPoint.target));
+          leftMovingList.removeAt(j);
+          break;
+        }
+      }
+      if (!findMergePoint) {
+        result.add(fallPoint);
+      }
+    }
+    for (int i = 0; i < leftMovingList.length; i++) {
+      result.add(leftMovingList[i]);
+    }
+    // 打印移动的星星位置
+    for (var point in result) {
+      debugPrint('move [${point.src.x}, ${point.src.y}] -> '
+          '[${point.target.x}, ${point.target.y}]');
+      grids[point.target.y][point.target.x].willMove(point.src);
     }
   }
 
   // 查找与被点击格子相连的相同颜色的格子
-  List<Point> findSameColors(int color, int dx, int dy) {
+  List<Point> findSameColors(StarGrid starGrid, int dx, int dy) {
     List<Point> list = <Point>[];
     list.add(Point(dx, dy));
     isNewPoint(Point point) {
-      if (grids[point.y][point.x] != color) {
+      if (!grids[point.y][point.x].isSameColor(starGrid)) {
         return false;
       }
       for (int i = 0; i < list.length; i++) {
@@ -240,19 +292,19 @@ class GridData {
   bool checkIfGameFinish() {
     for (int i = 0; i < row; i++) {
       for (int j = 0; j < col; j++) {
-        int colorNow = grids[i][j];
-        if (colorNow == 0) {
+        var gridNow = grids[i][j];
+        if (gridNow.isEmpty()) {
           continue;
         }
         if (j != col - 1) {
-          int colorRight = grids[i][j + 1];
-          if (colorNow == colorRight) {
+          var gridRight = grids[i][j + 1];
+          if (gridNow.isSameColor(gridRight)) {
             return false;
           }
         }
         if (i != row - 1) {
-          int colorBtm = grids[i + 1][j];
-          if (colorNow == colorBtm) {
+          var gridBtm = grids[i + 1][j];
+          if (gridNow.isSameColor(gridBtm)) {
             return false;
           }
         }
@@ -265,7 +317,7 @@ class GridData {
     int count = 0;
     for (int i = 0; i < row; i++) {
       for (int j = 0; j < col; j++) {
-        if (grids[i][j] != 0) {
+        if (grids[i][j].isNotEmpty()) {
           count++;
         }
       }
@@ -275,14 +327,7 @@ class GridData {
 
   void printGrids() {
     for (int i = 0; i < row; i++) {
-      print(grids[i]);
+      debugPrint(grids[i].toString());
     }
   }
-}
-
-class Point {
-  final int x;
-  final int y;
-
-  Point(this.x, this.y);
 }

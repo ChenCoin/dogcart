@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../data/grid_data.dart';
+import 'effect_board.dart';
 import 'star_board.dart';
 
 class GameBoard extends StatefulWidget {
@@ -26,14 +27,18 @@ class _GameBoardState extends State<GameBoard> {
     double width = widget.width;
     double grid = data.obtainGrid(width);
     double height = data.obtainHeight(grid);
-    return SizedBox(
-      width: width,
-      height: height,
-      child: StarBoard(
-        size: Size(width, height),
-        data: data,
-        callback: widget.callback,
-      ),
+    return Stack(
+      children: [
+        StarBoard(
+          size: Size(width, height),
+          data: data,
+          callback: widget.callback,
+        ),
+        EffectBoard(
+          size: Size(width, height),
+          data: data,
+        )
+      ],
     );
   }
 }

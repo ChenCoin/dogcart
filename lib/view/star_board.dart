@@ -69,11 +69,11 @@ class _MyPainter extends CustomPainter {
     int gap = GridData.gap;
     for (int i = 0; i < GridData.row; i++) {
       for (int j = 0; j < GridData.col; j++) {
-        int colorValue = data.grids[i][j];
-        if (colorValue == 0) {
+        var gridPoint = data.grids[i][j];
+        if (gridPoint.isEmpty()) {
           continue;
         }
-        (int, int) color = colorMap(colorValue);
+        (int, int) color = gridPoint.color;
         gridPaint.color = Color(color.$2);
 
         // 画圆角方块
@@ -115,24 +115,6 @@ class _MyPainter extends CustomPainter {
       double dx = rect.left + (grid + GridData.gap) * i + floor;
       canvas.drawLine(Offset(dx, rect.top + floor),
           Offset(dx, rect.bottom - floor * 2 + 2), paint);
-    }
-  }
-
-  // 颜色匹配
-  (int, int) colorMap(int number) {
-    switch (number) {
-      case 1:
-        return (0xFFEC7062, 0xFFE74C3C); // red
-      case 2:
-        return (0xFF5CADE2, 0xFF5599C7); // blue
-      case 3:
-        return (0xFFF4CF40, 0xFFF5B041); // yellow
-      case 4:
-        return (0xFFAF7AC4, 0xFFA569BD); // purple
-      case 5:
-        return (0xFF57D68C, 0xFF53BE80); // green
-      default:
-        return (0, 0);
     }
   }
 }

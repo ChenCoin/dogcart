@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      onGenerateTitle: (ctx) => '消灭星星',
+      onGenerateTitle: (ctx) => '收集星星星',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFFAFAF8)),
         primaryColor: const Color(0xFFFAFAF8),
