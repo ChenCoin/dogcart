@@ -39,7 +39,7 @@ class GridData {
   void Function(List<ColorPoint>) breakFn = (arg) {};
 
   // 移动星星动画函数
-  void Function(List<MovingStar>) movingFn = (arg) {};
+  void Function(List<StarGrid>) movingFn = (arg) {};
 
   // 临时调试
   var goals = <int>[
@@ -64,7 +64,8 @@ class GridData {
     for (int i = 0; i < row; i++) {
       List<StarGrid> list = [];
       for (int j = 0; j < col; j++) {
-        list.add(StarGrid());
+        var pos = Point<double>(j.toDouble(), i.toDouble());
+        list.add(StarGrid(pos, pos));
       }
       grids.add(list);
     }
@@ -97,7 +98,7 @@ class GridData {
   }
 
   void onViewInit(void Function(List<ColorPoint>) breakFn,
-      void Function(List<MovingStar>) movingFn) {
+      void Function(List<StarGrid>) movingFn) {
     this.breakFn = breakFn;
     this.movingFn = movingFn;
   }
@@ -215,13 +216,11 @@ class GridData {
 
   // 相连的方块个数大于2，消除方块，并移动剩余方块
   void blockGrids(List<Point<int>> sameColors) {
-    List<MovingPoint> fallList = <MovingPoint>[];
-    List<MovingPoint> leftMovingList = <MovingPoint>[];
-    List<MovingPoint> result = <MovingPoint>[];
     // 消除相同颜色的方块
     for (var point in sameColors) {
       grids[point.y][point.x].clear();
     }
+    List<StarGrid> starWillMove = <StarGrid>[];
     // 方块下落
     for (int i = 0; i < col; i++) {
       int blank = 0;
@@ -232,9 +231,10 @@ class GridData {
         }
         if (blank > 0) {
           grids[j + blank][i].clone(grids[j][i]);
+          grids[j + blank][i].setTarget(i, j + blank);
           grids[j][i].clear();
+          starWillMove.add(grids[j + blank][i]);
           // [j, i] -> [j + blank, i]
-          fallList.add(MovingPoint(Point<int>(i, j), Point<int>(i, j + blank)));
         }
       }
     }
@@ -251,46 +251,17 @@ class GridData {
             continue;
           }
           grids[j][i - blank].clone(grids[j][i]);
+          grids[j][i - blank].setTarget(i - blank, j);
           grids[j][i].clear();
+          starWillMove.add(grids[j][i - blank]);
           // [j, i] -> [j, i - blank]
-          leftMovingList
-              .add(MovingPoint(Point<int>(i, j), Point<int>(i - blank, j)));
         }
       }
     }
-    // 将下落和左移的点汇总
-    for (int i = 0; i < fallList.length; i++) {
-      MovingPoint fallPoint = fallList[i];
-      bool findMergePoint = false;
-      for (int j = 0; j < leftMovingList.length; j++) {
-        MovingPoint leftPoint = leftMovingList[j];
-        // 下落点的终点和左移点的起点是一样，则合并这2个点
-        if (fallPoint.target == leftPoint.src) {
-          findMergePoint = true;
-          result.add(MovingPoint(fallPoint.src, leftPoint.target));
-          leftMovingList.removeAt(j);
-          break;
-        }
-      }
-      if (!findMergePoint) {
-        result.add(fallPoint);
-      }
+    for(var item in starWillMove){
+      debugPrint('move [${item.position.x}, ${item.position.y}] -> [${item.target.x}, ${item.target.y}]');
     }
-    for (int i = 0; i < leftMovingList.length; i++) {
-      result.add(leftMovingList[i]);
-    }
-    // 打印移动的星星位置
-    for (var point in result) {
-      debugPrint('move [${point.src.x}, ${point.src.y}] -> '
-          '[${point.target.x}, ${point.target.y}]');
-      grids[point.target.y][point.target.x].willMove(point.src);
-    }
-    movingFn(result.map((e) {
-      StarGrid grid = grids[e.target.y][e.target.x];
-      var src = Point<double>(e.src.x.toDouble(), e.src.y.toDouble());
-      var target = Point<double>(e.target.x.toDouble(), e.target.y.toDouble());
-      return MovingStar(src, target, grid);
-    }).toList());
+    movingFn(starWillMove);
   }
 
   // 查找与被点击格子相连的相同颜色的格子

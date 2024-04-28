@@ -34,6 +34,14 @@ class StarGrid {
 
   bool _movingState = false;
 
+  Point<double> position;
+
+  Point<double> target;
+
+  Animation<double>? anim;
+
+  StarGrid(this.position, this.target);
+
   void setValue(int value) {
     _value = value;
     color = _colorMap(value);
@@ -48,7 +56,24 @@ class StarGrid {
   void clone(StarGrid other) {
     _value = other._value;
     color = other.color;
-    _movingState = other._movingState;
+    if (other.isMoving()) {
+      position = calcPosition(other);
+    } else {
+      position = other.position;
+    }
+    anim = null;
+  }
+
+  Point<double> calcPosition(StarGrid one) {
+    if (one.anim == null) {
+      return one.position;
+    }
+    double animValue = one.anim!.value;
+    double dx =
+        one.position.x + (one.target.x - one.position.x) * animValue / 100;
+    double dy =
+        one.position.y + (one.target.y - one.position.y) * animValue / 100;
+    return Point(dx, dy);
   }
 
   bool isEmpty() {
@@ -64,21 +89,33 @@ class StarGrid {
   }
 
   bool isMoving() {
-    return _movingState;
+    return _value != 0 && _movingState;
   }
 
-  void willMove(Point<int> src) {
+  void willMove(Animation<double> anim) {
     _movingState = true;
-  }
-
-  void willMoveDirect() {
-    _movingState = true;
+    this.anim = anim;
   }
 
   void endMove() {
     _movingState = false;
+    anim = null;
+    position = target;
   }
 
+  void setPosition(Point<double> pos) {
+    position = pos;
+  }
+
+  Point<double> getPosition() {
+    return position;
+  }
+
+  void setTarget(int dx, int dy) {
+    target = Point(dx.toDouble(), dy.toDouble());
+  }
+
+  // this function would remove later
   int getColorValue() {
     return _value;
   }

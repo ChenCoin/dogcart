@@ -47,7 +47,7 @@ class _EffectBoardState extends State<EffectBoard>
   }
 
   void createBreakStar(List<ColorPoint> list) {
-    Duration duration = const Duration(milliseconds: 800);
+    Duration duration = const Duration(milliseconds: 8000);
     var controller = AnimationController(duration: duration, vsync: this);
     // animation用于获取数值
     var curve = CurvedAnimation(parent: controller, curve: Curves.easeOutQuad);
@@ -65,21 +65,26 @@ class _EffectBoardState extends State<EffectBoard>
     controller.forward();
   }
 
-  void createMovingStar(List<MovingStar> list) {
-    Duration duration = const Duration(milliseconds: 800);
+  void createMovingStar(List<StarGrid> list) {
+    Duration duration = const Duration(milliseconds: 8000);
     var controller = AnimationController(duration: duration, vsync: this);
     // animation用于获取数值
     var curve = CurvedAnimation(parent: controller, curve: Curves.easeOutQuad);
     Animation<double> anim = Tween(begin: 0.0, end: 100.0).animate(curve)
       ..addListener(() => setState(() {}));
-    var movingStars = MovingStarList(list, anim);
+    for (var item in list) {
+      item.willMove(anim);
+    }
     controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
         allController.remove(controller);
-        widget.data.removeMovingStarList(movingStars);
+        for (var item in list) {
+          if (item.anim == anim) {
+            item.endMove();
+          }
+        }
       }
     });
-    widget.data.addMovingStarList(movingStars);
     allController.add(controller);
     controller.forward();
   }
@@ -141,23 +146,20 @@ class _MyPainter extends CustomPainter {
       ..isAntiAlias = true
       ..style = PaintingStyle.fill;
 
-    List<MovingStarList> movingStars = data.movingStarList;
-    for (var item in movingStars) {
-      if (item.anim.status != AnimationStatus.forward) {
-        continue;
-      }
-      var animValue = item.anim.value;
-      List<MovingStar> list = item.list;
+    int gap = GridData.gap;
+    for (int dy = 0; dy < GridData.row; dy++) {
+      for (int dx = 0; dx < GridData.col; dx++) {
+        var gridPoint = data.grids[dy][dx];
+        if (!gridPoint.isMoving()) {
+          continue;
+        }
+        double anim = gridPoint.anim?.value ?? 0;
+        double posY = gridPoint.position.y;
+        double i = posY + (dy - posY) * anim / 100;
+        double posX = gridPoint.position.x;
+        double j = posX + (dx - posX) * anim / 100;
 
-      for (var movingStar in list) {
-        double srcX = movingStar.src.x;
-        double srcY = movingStar.src.y;
-        double targetX = movingStar.target.x;
-        double targetY = movingStar.target.y;
-        double i = srcY + (targetY - srcY) * animValue / 100;
-        double j = srcX + (targetX - srcX) * animValue / 100;
-
-        (int, int) color = movingStar.grid.color;
+        (int, int) color = gridPoint.color;
         gridPaint.color = Color(color.$2);
 
         // 画圆角方块
