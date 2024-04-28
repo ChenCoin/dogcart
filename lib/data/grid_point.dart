@@ -44,6 +44,9 @@ class StarGrid {
     _value = 0;
     color = (0, 0);
     _movingState = false;
+    if (anim != null) {
+      anim = null;
+    }
   }
 
   void clone(StarGrid other) {

@@ -22,6 +22,7 @@ class _EffectBoardState extends State<EffectBoard>
   @override
   void initState() {
     super.initState();
+    debugPrint('-------------initState');
     widget.data.onViewInit(createBreakStar, createMovingStar);
   }
 
@@ -57,6 +58,7 @@ class _EffectBoardState extends State<EffectBoard>
     controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
         allController.remove(controller);
+        controller.dispose();
         widget.data.removeBreakStarList(breakStars);
       }
     });
@@ -78,6 +80,7 @@ class _EffectBoardState extends State<EffectBoard>
     controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
         allController.remove(controller);
+        controller.dispose();
         for (var item in list) {
           if (item.anim == anim) {
             item.endMove();
