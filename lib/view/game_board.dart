@@ -29,16 +29,19 @@ class _GameBoardState extends State<GameBoard> {
     double height = data.obtainHeight(grid);
     return Stack(
       children: [
-        StarBoard(
-          size: Size(width, height),
-          data: data,
-          callback: widget.callback,
+        RepaintBoundary(
+          child: StarBoard(
+            size: Size(width, height),
+            data: data,
+            callback: widget.callback,
+          ),
         ),
         Offstage(
           offstage: data.gameState != 1,
           child: EffectBoard(
             size: Size(width, height),
             data: data,
+            callback: () => setState(() {}),
           ),
         ),
       ],

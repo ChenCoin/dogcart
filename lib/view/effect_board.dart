@@ -9,7 +9,13 @@ class EffectBoard extends StatefulWidget {
 
   final GridData data;
 
-  const EffectBoard({super.key, required this.size, required this.data});
+  final void Function() callback;
+
+  const EffectBoard(
+      {super.key,
+      required this.size,
+      required this.data,
+      required this.callback});
 
   @override
   State<StatefulWidget> createState() => _EffectBoardState();
@@ -86,6 +92,7 @@ class _EffectBoardState extends State<EffectBoard>
             item.endMove();
           }
         }
+        widget.callback();
       }
     });
     allController.add(controller);

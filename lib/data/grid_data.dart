@@ -159,7 +159,7 @@ class GridData {
 
   int queryLevelGoal(int level) {
     if (level >= goals.length) {
-      return goals.last + 3000 * (level - goals.length + 1);
+      return goals.last + 2500 * (level - goals.length + 1);
     }
     return goals[level];
   }
