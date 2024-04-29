@@ -27,13 +27,11 @@ class StarGrid {
 
   bool _movingState = false;
 
-  Point<double> position;
+  Point<double> position = const Point<double>(0, 0);
 
-  Point<double> target;
+  Point<double> target = const Point<double>(0, 0);
 
   Animation<double>? anim;
-
-  StarGrid(this.position, this.target);
 
   void setValue(int value) {
     _value = value;
@@ -98,8 +96,10 @@ class StarGrid {
     position = target;
   }
 
-  void setPosition(Point<double> pos) {
+  // 在每一关卡开始时，刷新星星的位置信息
+  void updatePosition(Point<double> pos) {
     position = pos;
+    target = pos;
   }
 
   Point<double> getPosition() {

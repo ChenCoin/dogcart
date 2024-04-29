@@ -61,8 +61,7 @@ class GridData {
     for (int i = 0; i < row; i++) {
       List<StarGrid> list = [];
       for (int j = 0; j < col; j++) {
-        var pos = Point<double>(j.toDouble(), i.toDouble());
-        list.add(StarGrid(pos, pos));
+        list.add(StarGrid());
       }
       grids.add(list);
     }
@@ -144,6 +143,8 @@ class GridData {
     for (int i = 0; i < row; i++) {
       for (int j = 0; j < col; j++) {
         grids[i][j].setValue(random.nextInt(5) + 1);
+        var pos = Point<double>(j.toDouble(), i.toDouble());
+        grids[i][j].updatePosition(pos);
       }
     }
   }
@@ -251,10 +252,6 @@ class GridData {
           // [j, i] -> [j, i - blank]
         }
       }
-    }
-    for (var item in starWillMove) {
-      debugPrint(
-          'move [${item.position.x}, ${item.position.y}] -> [${item.target.x}, ${item.target.y}]');
     }
     movingFn(starWillMove);
   }
