@@ -92,7 +92,7 @@ class GridData {
     highestScore = max(score, highestScore);
     clearGrids();
     storeData();
-    onDispose();
+    breakStarList.clear();
   }
 
   void onViewInit(void Function(List<ColorPoint>) breakFn,
