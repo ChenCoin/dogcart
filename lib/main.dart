@@ -23,7 +23,6 @@ class MyApp extends StatelessWidget {
         primaryColor: const Color(0xFFFAFAF8),
         useMaterial3: true,
       ),
-      supportedLocales: const [Locale("zh", "CN"), Locale("en", "US")],
       home: const MyHomePage(),
     );
   }

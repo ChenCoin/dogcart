@@ -28,7 +28,6 @@ class _EffectBoardState extends State<EffectBoard>
   @override
   void initState() {
     super.initState();
-    debugPrint('-------------initState');
     widget.data.onViewInit(createBreakStar, createMovingStar);
   }
 
@@ -156,7 +155,6 @@ class _MyPainter extends CustomPainter {
       ..isAntiAlias = true
       ..style = PaintingStyle.fill;
 
-    int gap = GridData.gap;
     for (int dy = 0; dy < GridData.row; dy++) {
       for (int dx = 0; dx < GridData.col; dx++) {
         var gridPoint = data.grids[dy][dx];
@@ -164,9 +162,9 @@ class _MyPainter extends CustomPainter {
           continue;
         }
         double anim = gridPoint.anim?.value ?? 0;
-        double posY = gridPoint.position.y;
+        double posY = gridPoint.getPosition().y;
         double i = posY + (dy - posY) * anim / 100;
-        double posX = gridPoint.position.x;
+        double posX = gridPoint.getPosition().x;
         double j = posX + (dx - posX) * anim / 100;
 
         (int, int) color = gridPoint.color;

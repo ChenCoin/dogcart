@@ -12,7 +12,7 @@ class GridData {
 
   static const int gap = 4;
 
-  List<List<StarGrid>> grids = [];
+  late List<List<StarGrid>> grids = _createList();
 
   // 当前分数
   int score = 0;
@@ -39,33 +39,11 @@ class GridData {
   void Function(List<StarGrid>) movingFn = (arg) {};
 
   // 临时调试
-  var goals = <int>[
-    1000,
-    2500,
-    4000,
-    5500,
-    7500,
-    9000,
-    11000,
-    13500,
-    16500,
-    20500,
-    24000
-  ];
+  var goals = <int>[1000, 2500, 4000, 5500, 7500, 9000, 11000, 13500, 16500];
 
   // 游戏状态，0为初始进入游戏，1为游戏中，2为游戏结束，3为游戏中等待下一关，4为游戏结算画面
   // 状态2已不再使用
   int gameState = 0;
-
-  GridData() {
-    for (int i = 0; i < row; i++) {
-      List<StarGrid> list = [];
-      for (int j = 0; j < col; j++) {
-        list.add(StarGrid());
-      }
-      grids.add(list);
-    }
-  }
 
   void init() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -188,29 +166,33 @@ class GridData {
     return grid * GridData.row + GridData.gap * (GridData.row + 1);
   }
 
-  int onTap(int dx, int dy) {
-    if (dy >= row || dx >= col) {
-      return 0;
+  bool onTap(int dx, int dy) {
+    if (dx < 0 || dy < 0 || dx >= col || dy >= row) {
+      return false;
     }
     var starGrid = grids[dy][dx];
     if (starGrid.isEmpty()) {
-      return 0;
+      return false;
     }
-    var sameColors = findSameColors(starGrid, dx, dy, starGrid.getColorValue());
-    if (sameColors.length >= 2) {
-      // 创建动画
-      breakFn(sameColors);
-      blockGrids(sameColors);
-      var value = sameColors.length * sameColors.length * 5;
-      scoreLevel += value;
-      score += value;
-    }
+    // 查找相连的同颜色的星星
+    var sameColors = findSameColors(starGrid, starGrid.toColorPoint());
     debugPrint('onTap $dx $dy, num: ${sameColors.length}');
-    return sameColors.length;
+    if (sameColors.length < 2) {
+      return false;
+    }
+    // 创建消灭的星星的动画
+    breakFn(sameColors);
+    // 标记需要移动的星星，并创建星星移动位置的动画
+    movingFn(brokeGrids(sameColors));
+    // 结算分数
+    var value = sameColors.length * sameColors.length * 5;
+    scoreLevel += value;
+    score += value;
+    return true;
   }
 
   // 相连的方块个数大于2，消除方块，并移动剩余方块
-  void blockGrids(List<Point<int>> sameColors) {
+  List<StarGrid> brokeGrids(List<Point<int>> sameColors) {
     // 消除相同颜色的方块
     for (var point in sameColors) {
       grids[point.y][point.x].clear();
@@ -226,7 +208,6 @@ class GridData {
         }
         if (blank > 0) {
           grids[j + blank][i].clone(grids[j][i]);
-          grids[j + blank][i].setTarget(i, j + blank);
           grids[j][i].clear();
           starWillMove.add(grids[j + blank][i]);
           // [j, i] -> [j + blank, i]
@@ -246,21 +227,20 @@ class GridData {
             continue;
           }
           grids[j][i - blank].clone(grids[j][i]);
-          grids[j][i - blank].setTarget(i - blank, j);
           grids[j][i].clear();
           starWillMove.add(grids[j][i - blank]);
           // [j, i] -> [j, i - blank]
         }
       }
     }
-    movingFn(starWillMove);
+    return starWillMove;
   }
 
   // 查找与被点击格子相连的相同颜色的格子
-  List<ColorPoint> findSameColors(
-      StarGrid starGrid, int dx, int dy, int color) {
+  List<ColorPoint> findSameColors(StarGrid starGrid, ColorPoint colorPoint) {
+    int color = colorPoint.value;
     List<ColorPoint> list = <ColorPoint>[];
-    list.add(ColorPoint(dx, dy, color));
+    list.add(colorPoint);
     isNewPoint(Point<int> point) {
       if (!grids[point.y][point.x].isSameColor(starGrid)) {
         return false;
@@ -332,6 +312,19 @@ class GridData {
       }
     }
     return count;
+  }
+
+  List<List<StarGrid>> _createList() {
+    final List<List<StarGrid>> data = [];
+    for (int i = 0; i < row; i++) {
+      List<StarGrid> list = [];
+      for (int j = 0; j < col; j++) {
+        var pos = Point<double>(j.toDouble(), i.toDouble());
+        list.add(StarGrid(pos));
+      }
+      data.add(list);
+    }
+    return List.unmodifiable(data);
   }
 
   void printGrids() {

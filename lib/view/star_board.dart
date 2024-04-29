@@ -37,8 +37,8 @@ class _StarBoardState extends State<StarBoard> {
 
   void onTap(double dx, double dy) {
     double grid = widget.size.width / GridData.col;
-    int score = widget.data.onTap((dx / grid).floor(), (dy / grid).floor());
-    if (score >= 2) {
+    bool isStarBroke = widget.data.onTap((dx / grid).floor(), (dy / grid).floor());
+    if (isStarBroke) {
       widget.callback(widget.data.checkIfGameFinish());
     }
   }

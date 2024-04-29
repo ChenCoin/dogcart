@@ -21,17 +21,21 @@ class BreakStarList {
 }
 
 class StarGrid {
+  // 星星所在位置，创建对象时就固定下来
+  final Point<double> _location;
+
+  // 星星当前所在位置。移动星星时，由_position移动到_location
+  Point<double> _position = const Point<double>(0, 0);
+
   int _value = 0;
 
   (int, int) color = (0, 0);
 
   bool _movingState = false;
 
-  Point<double> position = const Point<double>(0, 0);
-
-  Point<double> target = const Point<double>(0, 0);
-
   Animation<double>? anim;
+
+  StarGrid(this._location);
 
   void setValue(int value) {
     _value = value;
@@ -42,30 +46,28 @@ class StarGrid {
     _value = 0;
     color = (0, 0);
     _movingState = false;
-    if (anim != null) {
-      anim = null;
-    }
+    anim = null;
   }
 
   void clone(StarGrid other) {
     _value = other._value;
     color = other.color;
     if (other.isMoving()) {
-      position = calcPosition(other);
+      _position = calcPosition(other);
     } else {
-      position = other.position;
+      _position = other._position;
     }
     anim = null;
   }
 
   Point<double> calcPosition(StarGrid one) {
-    var pos = one.position;
+    var pos = one._position;
     if (one.anim == null) {
       return pos;
     }
     double animValue = one.anim!.value;
-    double dx = pos.x + (one.target.x - pos.x) * animValue / 100;
-    double dy = pos.y + (one.target.y - pos.y) * animValue / 100;
+    double dx = pos.x + (one._location.x - pos.x) * animValue / 100;
+    double dy = pos.y + (one._location.y - pos.y) * animValue / 100;
     return Point(dx, dy);
   }
 
@@ -93,26 +95,20 @@ class StarGrid {
   void endMove() {
     _movingState = false;
     anim = null;
-    position = target;
+    _position = _location;
   }
 
   // 在每一关卡开始时，刷新星星的位置信息
   void updatePosition(Point<double> pos) {
-    position = pos;
-    target = pos;
+    _position = pos;
   }
 
   Point<double> getPosition() {
-    return position;
+    return _position;
   }
 
-  void setTarget(int dx, int dy) {
-    target = Point(dx.toDouble(), dy.toDouble());
-  }
-
-  // this function would remove later
-  int getColorValue() {
-    return _value;
+  ColorPoint toColorPoint() {
+    return ColorPoint(_location.x.toInt(), _location.y.toInt(), _value);
   }
 }
 

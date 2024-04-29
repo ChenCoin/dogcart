@@ -38,10 +38,12 @@ class _GameBoardState extends State<GameBoard> {
         ),
         Offstage(
           offstage: data.gameState != 1,
-          child: EffectBoard(
-            size: Size(width, height),
-            data: data,
-            callback: () => setState(() {}),
+          child: RepaintBoundary(
+            child: EffectBoard(
+              size: Size(width, height),
+              data: data,
+              callback: () => setState(() {}),
+            ),
           ),
         ),
       ],

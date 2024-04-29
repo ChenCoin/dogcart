@@ -1,7 +1,7 @@
 import 'dart:async';
-import 'package:dogcart/view/count_down.dart';
 import 'package:flutter/material.dart';
 import '../data/grid_data.dart';
+import 'count_down.dart';
 
 class LevelPanel extends StatefulWidget {
   final GridData data;
