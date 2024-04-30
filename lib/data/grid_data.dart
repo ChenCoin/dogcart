@@ -3,13 +3,10 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../ux.dart';
 import 'grid_point.dart';
 
 class GridData {
-  static const int col = 10;
-
-  static const int row = 10;
-
   static const int gap = 4;
 
   late List<List<StarGrid>> grids = _createList();
@@ -32,11 +29,8 @@ class GridData {
   // 打破星星的动画列表
   List<BreakStarList> breakStarList = <BreakStarList>[];
 
-  // 打破星星动画函数
-  void Function(List<ColorPoint>) breakFn = (arg) {};
-
-  // 移动星星动画函数
-  void Function(List<StarGrid>) movingFn = (arg) {};
+  // 打破星星动画和移动星星动画的函数
+  EffectCreator effectCreator = NilEffectCreator();
 
   // 临时调试
   var goals = <int>[1000, 2500, 4000, 5500, 7500, 9000, 11000, 13500, 16500];
@@ -72,15 +66,12 @@ class GridData {
     breakStarList.clear();
   }
 
-  void onViewInit(void Function(List<ColorPoint>) breakFn,
-      void Function(List<StarGrid>) movingFn) {
-    this.breakFn = breakFn;
-    this.movingFn = movingFn;
+  void onViewInit(EffectCreator effectCreator) {
+    this.effectCreator = effectCreator;
   }
 
   void onDispose() {
-    breakFn = (arg) {};
-    movingFn = (arg) {};
+    effectCreator = NilEffectCreator();
     breakStarList.clear();
   }
 
@@ -118,8 +109,8 @@ class GridData {
 
   void fillGrids() {
     var random = Random();
-    for (int i = 0; i < row; i++) {
-      for (int j = 0; j < col; j++) {
+    for (int i = 0; i < UX.row; i++) {
+      for (int j = 0; j < UX.col; j++) {
         grids[i][j].setValue(random.nextInt(5) + 1);
         var pos = Point<double>(j.toDouble(), i.toDouble());
         grids[i][j].updatePosition(pos);
@@ -128,8 +119,8 @@ class GridData {
   }
 
   void clearGrids() {
-    for (int i = 0; i < row; i++) {
-      for (int j = 0; j < col; j++) {
+    for (int i = 0; i < UX.row; i++) {
+      for (int j = 0; j < UX.col; j++) {
         grids[i][j].clear();
       }
     }
@@ -159,15 +150,15 @@ class GridData {
   }
 
   double obtainGrid(double width) {
-    return (width - (GridData.gap * (GridData.col + 1))) / GridData.col;
+    return (width - (GridData.gap * (UX.col + 1))) / UX.col;
   }
 
   double obtainHeight(double grid) {
-    return grid * GridData.row + GridData.gap * (GridData.row + 1);
+    return grid * UX.row + GridData.gap * (UX.row + 1);
   }
 
   bool onTap(int dx, int dy) {
-    if (dx < 0 || dy < 0 || dx >= col || dy >= row) {
+    if (dx < 0 || dy < 0 || dx >= UX.col || dy >= UX.row) {
       return false;
     }
     var starGrid = grids[dy][dx];
@@ -180,10 +171,13 @@ class GridData {
     if (sameColors.length < 2) {
       return false;
     }
-    // 创建消灭的星星的动画
-    breakFn(sameColors);
-    // 标记需要移动的星星，并创建星星移动位置的动画
-    movingFn(brokeGrids(sameColors));
+    // 动画不可用，点击无效
+    if (!effectCreator.isEffectEnable()) {
+      debugPrint('tap cancel as animation running');
+      return false;
+    }
+    // 创建消灭的星星的动画；标记需要移动的星星，并创建星星移动位置的动画
+    effectCreator.createEffect(sameColors, brokeGrids(sameColors));
     // 结算分数
     var value = sameColors.length * sameColors.length * 5;
     scoreLevel += value;
@@ -199,9 +193,9 @@ class GridData {
     }
     List<StarGrid> starWillMove = <StarGrid>[];
     // 方块下落
-    for (int i = 0; i < col; i++) {
+    for (int i = 0; i < UX.col; i++) {
       int blank = 0;
-      for (int j = row - 1; j >= 0; j--) {
+      for (int j = UX.row - 1; j >= 0; j--) {
         if (grids[j][i].isEmpty()) {
           blank++;
           continue;
@@ -216,13 +210,13 @@ class GridData {
     }
     // 方块左移
     int blank = 0;
-    for (int i = 0; i < col; i++) {
-      if (grids[row - 1][i].isEmpty()) {
+    for (int i = 0; i < UX.col; i++) {
+      if (grids[UX.row - 1][i].isEmpty()) {
         blank++;
         continue;
       }
       if (blank > 0) {
-        for (int j = 0; j < row; j++) {
+        for (int j = 0; j < UX.row; j++) {
           if (grids[j][i].isEmpty()) {
             continue;
           }
@@ -263,7 +257,7 @@ class GridData {
         list.add(top);
       }
       var bottom = ColorPoint(now.x, now.y + 1, color);
-      if (bottom.y < row && isNewPoint(bottom)) {
+      if (bottom.y < UX.row && isNewPoint(bottom)) {
         list.add(bottom);
       }
       var left = ColorPoint(now.x - 1, now.y, color);
@@ -271,7 +265,7 @@ class GridData {
         list.add(left);
       }
       var right = ColorPoint(now.x + 1, now.y, color);
-      if (right.x < col && isNewPoint(right)) {
+      if (right.x < UX.col && isNewPoint(right)) {
         list.add(right);
       }
     }
@@ -279,19 +273,19 @@ class GridData {
   }
 
   bool checkIfGameFinish() {
-    for (int i = 0; i < row; i++) {
-      for (int j = 0; j < col; j++) {
+    for (int i = 0; i < UX.row; i++) {
+      for (int j = 0; j < UX.col; j++) {
         var gridNow = grids[i][j];
         if (gridNow.isEmpty()) {
           continue;
         }
-        if (j != col - 1) {
+        if (j != UX.col - 1) {
           var gridRight = grids[i][j + 1];
           if (gridNow.isSameColor(gridRight)) {
             return false;
           }
         }
-        if (i != row - 1) {
+        if (i != UX.row - 1) {
           var gridBtm = grids[i + 1][j];
           if (gridNow.isSameColor(gridBtm)) {
             return false;
@@ -304,8 +298,8 @@ class GridData {
 
   int queryStarLast() {
     int count = 0;
-    for (int i = 0; i < row; i++) {
-      for (int j = 0; j < col; j++) {
+    for (int i = 0; i < UX.row; i++) {
+      for (int j = 0; j < UX.col; j++) {
         if (grids[i][j].isNotEmpty()) {
           count++;
         }
@@ -316,9 +310,9 @@ class GridData {
 
   List<List<StarGrid>> _createList() {
     final List<List<StarGrid>> data = [];
-    for (int i = 0; i < row; i++) {
+    for (int i = 0; i < UX.row; i++) {
       List<StarGrid> list = [];
-      for (int j = 0; j < col; j++) {
+      for (int j = 0; j < UX.col; j++) {
         var pos = Point<double>(j.toDouble(), i.toDouble());
         list.add(StarGrid(pos));
       }
@@ -328,8 +322,23 @@ class GridData {
   }
 
   void printGrids() {
-    for (int i = 0; i < row; i++) {
+    for (int i = 0; i < UX.row; i++) {
       debugPrint(grids[i].toString());
     }
   }
+}
+
+abstract class EffectCreator {
+  bool isEffectEnable();
+
+  void createEffect(List<ColorPoint> breakList, List<StarGrid> movingList);
+}
+
+class NilEffectCreator implements EffectCreator {
+  // 没有动画时，游戏逻辑不执行
+  @override
+  bool isEffectEnable() => false;
+
+  @override
+  void createEffect(List<ColorPoint> breakList, List<StarGrid> movingList) {}
 }
