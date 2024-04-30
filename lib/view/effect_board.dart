@@ -117,8 +117,8 @@ class _MyPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     int gap = GridData.gap;
     double grid = data.obtainGrid(width);
-    drawBreakStar(canvas, gap, grid);
     drawMovingStar(canvas, gap, grid);
+    drawBreakStar(canvas, gap, grid);
   }
 
   @override
