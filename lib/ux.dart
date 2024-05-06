@@ -8,8 +8,11 @@ class UX {
   // 动画的同一个时间的处理数，决定同时进行“消除星星”动作的个数
   static const animationCacheSize = 4;
 
-  // 动画持续时间
-  static const animationDuration = 800;
+  // 星星移动动画持续时间
+  static const moveStarDuration = 500;
+
+  // 星星破碎动画持续时间
+  static const breakStarDuration = 1200;
 
   // mac环境
   static const debugMode = false;

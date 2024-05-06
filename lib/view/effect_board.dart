@@ -39,7 +39,7 @@ class _EffectBoardState extends State<EffectBoard>
     return IgnorePointer(
       child: CustomPaint(
         size: size,
-        painter: _MyPainter(width: size.width, data: widget.data),
+        painter: _MyPainter(data: widget.data),
       ),
     );
   }
@@ -62,32 +62,40 @@ class _EffectBoardState extends State<EffectBoard>
     var cache = cachePair.getAnimationCache();
     cache.using = true;
     var animCache = cache.getAnimationCache();
-    var controller = animCache.$1;
-    var anim = animCache.$2;
 
-    var breakStars = BreakStarList(breakList, anim, color);
+    var breakController = animCache.bc;
+    var breakAnim = animCache.ba;
+
+    // anim duration of 'moving star' should short than 'break star'
+    var breakStars = BreakStarList(breakList, breakAnim, color);
     widget.data.addBreakStarList(breakStars);
-    for (var item in movingList) {
-      item.willMove(anim);
-    }
-    cache.addListener((status) {
+    cache.addBreakListener((status) {
       if (status == AnimationStatus.completed) {
         cache.using = false;
         cache.removeListener();
         widget.data.removeBreakStarList(breakStars);
+      }
+    });
+
+    var movingController = animCache.mc;
+    var movingAnim = animCache.ma;
+    for (var item in movingList) {
+      item.willMove(movingAnim);
+    }
+    cache.addMovingListener((status) {
+      if (status == AnimationStatus.completed) {
         // 结束移动星星的动画
         for (var item in movingList) {
-          if (item.anim == anim) {
+          if (item.anim == movingAnim) {
             item.endMove();
           }
         }
         widget.callback();
-        debugPrint('anim end');
       }
     });
-    controller.addStatusListener(cache._cacheListener);
-    controller.forward();
-    debugPrint('anim start');
+
+    breakController.forward();
+    movingController.forward();
   }
 
   void sync() {
@@ -96,8 +104,6 @@ class _EffectBoardState extends State<EffectBoard>
 }
 
 class _MyPainter extends CustomPainter {
-  final double width;
-
   final GridData data;
 
   final path = Path();
@@ -112,7 +118,7 @@ class _MyPainter extends CustomPainter {
     ..isAntiAlias = true
     ..style = PaintingStyle.fill;
 
-  _MyPainter({required this.width, required this.data});
+  _MyPainter({required this.data});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -188,6 +194,18 @@ class _MyPainter extends CustomPainter {
   }
 }
 
+class AnimationPair {
+  AnimationController mc;
+
+  Animation<double> ma;
+
+  AnimationController bc;
+
+  Animation<double> ba;
+
+  AnimationPair(this.mc, this.ma, this.bc, this.ba);
+}
+
 class _Cache {
   bool using = false;
 
@@ -195,34 +213,52 @@ class _Cache {
 
   VoidCallback callback;
 
-  (AnimationController, Animation<double>)? _cache;
+  AnimationPair? _cache;
 
-  AnimationStatusListener _cacheListener = (status) {};
+  AnimationStatusListener _mCacheListener = (status) {};
+
+  AnimationStatusListener _bCacheListener = (status) {};
 
   _Cache(this.ticker, this.callback);
 
-  (AnimationController, Animation<double>) getAnimationCache() {
+  AnimationPair getAnimationCache() {
     if (_cache == null) {
-      Duration duration = const Duration(milliseconds: UX.animationDuration);
+      Duration duration = const Duration(milliseconds: UX.moveStarDuration);
       var controller = AnimationController(duration: duration, vsync: ticker);
       // animation用于获取数值
       var curve =
           CurvedAnimation(parent: controller, curve: Curves.easeOutQuad);
       var anim = Tween(begin: 0.0, end: 100.0).animate(curve)
         ..addListener(callback);
-      _cache = (controller, anim);
+
+      Duration duration2 = const Duration(milliseconds: UX.breakStarDuration);
+      var controller2 = AnimationController(duration: duration2, vsync: ticker);
+      // animation用于获取数值
+      var curve2 =
+          CurvedAnimation(parent: controller2, curve: Curves.easeOutQuad);
+      var anim2 = Tween(begin: 0.0, end: 100.0).animate(curve2)
+        ..addListener(callback);
+      _cache = AnimationPair(controller, anim, controller2, anim2);
     } else {
-      _cache!.$1.reset();
+      _cache!.mc.reset();
+      _cache!.bc.reset();
     }
     return _cache!;
   }
 
-  void addListener(AnimationStatusListener listener) {
-    _cacheListener = listener;
+  void addMovingListener(AnimationStatusListener listener) {
+    _mCacheListener = listener;
+    _cache?.mc.addStatusListener(_mCacheListener);
+  }
+
+  void addBreakListener(AnimationStatusListener listener) {
+    _bCacheListener = listener;
+    _cache?.bc.addStatusListener(_bCacheListener);
   }
 
   void removeListener() {
-    getAnimationCache().$1.removeStatusListener(_cacheListener);
+    _cache?.mc.removeStatusListener(_mCacheListener);
+    _cache?.bc.removeStatusListener(_bCacheListener);
   }
 }
 
@@ -257,7 +293,8 @@ class _CachePair {
 
   void dispose() {
     for (var item in _list) {
-      item._cache?.$1.dispose();
+      item._cache?.mc.dispose();
+      item._cache?.bc.dispose();
     }
   }
 }

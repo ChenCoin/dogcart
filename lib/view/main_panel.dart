@@ -34,13 +34,17 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _onStateChange(bool isFinish) {
     if (isFinish) {
-      var duration = const Duration(milliseconds: UX.animationDuration);
+      int animDuration = max(UX.breakStarDuration, UX.moveStarDuration);
+      var duration = Duration(milliseconds: animDuration);
       Future.delayed(duration, _onLevelFinish);
     }
     debugPrint('----- call redraw $isFinish');
   }
 
   void _onLevelNext() {
+    if(!data.isGameRunning()){
+      return;
+    }
     data.nextLevel();
   }
 
