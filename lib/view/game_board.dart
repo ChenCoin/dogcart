@@ -25,8 +25,7 @@ class _GameBoardState extends State<GameBoard> {
   Widget build(BuildContext context) {
     var data = widget.data;
     double width = widget.width;
-    double grid = data.obtainGrid(width);
-    double height = data.obtainHeight(grid);
+    double height = data.obtainHeight(data.grid);
     return Stack(
       children: [
         RepaintBoundary(

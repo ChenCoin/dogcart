@@ -46,9 +46,9 @@ class _EffectBoardState extends State<EffectBoard>
 
   @override
   void dispose() {
+    cachePair.dispose();
     super.dispose();
     widget.data.onDispose();
-    cachePair.dispose();
   }
 
   @override
@@ -57,14 +57,15 @@ class _EffectBoardState extends State<EffectBoard>
   }
 
   @override
-  void createEffect(List<ColorPoint> breakList, List<StarGrid> movingList) {
+  void createEffect(
+      (int, int) color, List<ColorPoint> breakList, List<StarGrid> movingList) {
     var cache = cachePair.getAnimationCache();
     cache.using = true;
     var animCache = cache.getAnimationCache();
     var controller = animCache.$1;
     var anim = animCache.$2;
 
-    var breakStars = BreakStarList(breakList, anim);
+    var breakStars = BreakStarList(breakList, anim, color);
     widget.data.addBreakStarList(breakStars);
     for (var item in movingList) {
       item.willMove(anim);
@@ -115,49 +116,44 @@ class _MyPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    int gap = GridData.gap;
-    double grid = data.obtainGrid(width);
-    drawMovingStar(canvas, gap, grid);
-    drawBreakStar(canvas, gap, grid);
+    drawMovingStar(canvas);
+    drawBreakStar(canvas);
   }
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 
-  void drawBreakStar(Canvas canvas, int gap, double grid) {
+  void drawBreakStar(Canvas canvas) {
+    double grid = data.grid;
     List<BreakStarList> breakStars = data.breakStarList;
     for (var item in breakStars) {
       if (item.anim.status != AnimationStatus.forward) {
         continue;
       }
-      var animValue = 100 - item.anim.value;
+      int color = item.color.$1;
       List<ColorPoint> list = item.list;
-      double textDx = 0;
-      double textDy = 0;
       for (var colorPoint in list) {
-        int i = colorPoint.y;
-        int j = colorPoint.x;
-        textDx += j;
-        textDy += i;
         // 画五角星
-        var left = grid * j + gap * (j + 1);
-        var top = grid * i + gap * (i + 1);
+        var animValue = 100 - item.anim.value / 2; // 100 -> 50
         double R = (grid / 2 - 2) * animValue / 100;
         double r = (grid / 4) * animValue / 100;
-        drawStar(path, R, r, left + grid / 2, top + grid / 2, 0);
-        starPaint.color = Color(colorPoint.color.$1);
-        canvas.drawPath(path, starPaint);
+        var rot = 360 * item.anim.value / 100;
+        int alpha = 255 * (100 - item.anim.value) ~/ 100;
+        starPaint.color = Color(color).withAlpha(alpha);
+
+        for (var end in colorPoint.probability) {
+          var dx = colorPoint.start.$1 + end.$1 * item.anim.value / 100;
+          var dy = colorPoint.start.$2 + end.$2 * item.anim.value / 100;
+          drawStar(path, R, r, dx, dy, rot);
+          canvas.drawPath(path, starPaint);
+        }
       }
-      textDx /= list.length;
-      textDx = grid * (textDx + 0.5) + gap * (textDx + 1);
-      textDy /= list.length;
-      textDy = grid * (textDy) + gap * (textDy + 1) + 24 / 2;
-      var score = list.length * list.length * 5;
-      numberDrawer.drawNumber(canvas, textDx, textDy, '+$score');
     }
   }
 
-  void drawMovingStar(Canvas canvas, int gap, double grid) {
+  void drawMovingStar(Canvas canvas) {
+    int gap = GridData.gap;
+    double grid = data.grid;
     // 绘制格子
     for (int dy = 0; dy < UX.row; dy++) {
       for (int dx = 0; dx < UX.col; dx++) {
@@ -173,6 +169,7 @@ class _MyPainter extends CustomPainter {
 
         (int, int) color = gridPoint.color;
         gridPaint.color = Color(color.$2);
+        starPaint.color = Color(color.$1);
 
         // 画圆角方块
         var left = grid * j + gap * (j + 1);
@@ -185,7 +182,6 @@ class _MyPainter extends CustomPainter {
         top = top + grid / 2;
         drawStar(path, grid / 2 - 2, grid / 4, left, top, 0);
         canvas.drawShadow(path, const Color(0xFF808080), 3, false);
-        starPaint.color = Color(color.$1);
         canvas.drawPath(path, starPaint);
       }
     }
@@ -261,8 +257,7 @@ class _CachePair {
 
   void dispose() {
     for (var item in _list) {
-      var cache = item.getAnimationCache();
-      cache.$1.dispose();
+      item._cache?.$1.dispose();
     }
   }
 }

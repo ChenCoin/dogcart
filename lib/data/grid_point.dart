@@ -2,22 +2,40 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import 'grid_data.dart';
+
 class ColorPoint extends Point<int> {
-  int value;
+  (double, double) start = (0, 0);
 
-  (int, int) color = (0, 0);
+  (double, double) end = (0, 0);
 
-  ColorPoint(super.x, super.y, this.value) {
-    color = _colorMap(value);
+  List<(double, double)> probability = <(double, double)>[];
+
+  ColorPoint(super.x, super.y);
+
+  void initValue(double grid, Random random) {
+    double left = grid * x + GridData.gap * (x + 1);
+    double top = grid * y + GridData.gap * (y + 1);
+    start = (left + grid / 2, top + grid / 2);
+
+    probability.add(createEndPoint(grid, random));
+    probability.add(createEndPoint(grid, random));
+  }
+
+  (double, double) createEndPoint(double grid, Random random) {
+    var angle = 360 * random.nextDouble();
+    return (grid * 2 * sin(angle), grid * 2 * cos(angle));
   }
 }
 
 class BreakStarList {
   List<ColorPoint> list;
 
+  (int, int) color = (0, 0);
+
   Animation<double> anim;
 
-  BreakStarList(this.list, this.anim);
+  BreakStarList(this.list, this.anim, this.color);
 }
 
 class StarGrid {
@@ -34,6 +52,12 @@ class StarGrid {
   bool _movingState = false;
 
   Animation<double>? anim;
+
+  // cache the left of static grids
+  double left = 0;
+
+  // cache the top of static grids
+  double top = 0;
 
   StarGrid(this._location);
 
@@ -99,8 +123,10 @@ class StarGrid {
   }
 
   // 在每一关卡开始时，刷新星星的位置信息
-  void updatePosition(Point<double> pos) {
+  void updatePosition(Point<double> pos, double grid) {
     _position = pos;
+    left = grid * pos.x + GridData.gap * (pos.x + 1);
+    top = grid * pos.y + GridData.gap * (pos.y + 1);
   }
 
   Point<double> getPosition() {
@@ -108,7 +134,7 @@ class StarGrid {
   }
 
   ColorPoint toColorPoint() {
-    return ColorPoint(_location.x.toInt(), _location.y.toInt(), _value);
+    return ColorPoint(_location.x.toInt(), _location.y.toInt());
   }
 }
 

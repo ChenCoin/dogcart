@@ -31,12 +31,13 @@ class _StarBoardState extends State<StarBoard> {
       },
       child: CustomPaint(
         size: size,
-        painter: _MyPainter(width: size.width, data: widget.data),
+        painter: _MyPainter(data: widget.data),
       ),
     );
   }
 
   void onTap(double dx, double dy) {
+    // the grid here is not same as GridData.grid
     double grid = widget.size.width / UX.col;
     bool isStarBroke =
         widget.data.onTap((dx / grid).floor(), (dy / grid).floor());
@@ -47,8 +48,6 @@ class _StarBoardState extends State<StarBoard> {
 }
 
 class _MyPainter extends CustomPainter {
-  final double width;
-
   final GridData data;
 
   final path = Path();
@@ -67,16 +66,15 @@ class _MyPainter extends CustomPainter {
     ..color = const Color(0xFFEAEAE8)
     ..strokeWidth = 1.0;
 
-  _MyPainter({required this.width, required this.data});
+  _MyPainter({required this.data});
 
   @override
   void paint(Canvas canvas, Size size) {
     var rect = Offset.zero & size;
-    double grid = data.obtainGrid(width);
+    double grid = data.grid;
     drawBackground(canvas, rect, grid);
 
     // 绘制格子
-    int gap = GridData.gap;
     for (int i = 0; i < UX.row; i++) {
       for (int j = 0; j < UX.col; j++) {
         var gridPoint = data.grids[i][j];
@@ -87,8 +85,8 @@ class _MyPainter extends CustomPainter {
         gridPaint.color = Color(color.$2);
 
         // 画圆角方块
-        var left = grid * j + gap * (j + 1);
-        var top = grid * i + gap * (i + 1);
+        var left = gridPoint.left;
+        var top = gridPoint.top;
         drawSmoothRoundRect(path, left, top, grid, grid, 12);
         canvas.drawPath(path, gridPaint);
 

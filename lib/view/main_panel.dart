@@ -55,6 +55,7 @@ class _MyHomePageState extends State<MyHomePage> {
     final screenSize = MediaQuery.of(context).size;
     // 宽度为屏幕宽度 - 40，特殊适配大屏
     final double width = min(screenSize.width - 12, 480);
+    data.initGridSize(width);
     return Align(
       alignment: Alignment.topCenter,
       child: Column(

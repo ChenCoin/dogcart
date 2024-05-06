@@ -23,26 +23,23 @@ class MyApp extends StatelessWidget {
       ),
       home: Scaffold(
         backgroundColor: const Color(0xFFFAFAF8),
-        body: home(context),
+        body: Stack(
+          children: [
+            const MyHomePage(),
+            IgnorePointer(child: home(context)),
+          ],
+        ),
       ),
     );
   }
 
   Widget home(BuildContext context) {
-    if (UX.debugMode) {
-      return Stack(
-        children: [
-          const MyHomePage(),
-          MeteorBoard(size: MediaQuery.of(context).size),
-          IgnorePointer(
-            child: Container(
-              decoration: const BoxDecoration(color: Color(0xD0000000)),
-            ),
-          ),
-        ],
-      );
-    } else {
-      return const MyHomePage();
-    }
+    return Stack(
+      children: [
+        if (UX.debugMode)
+          Container(decoration: const BoxDecoration(color: Color(0xD0000000))),
+        MeteorBoard(size: MediaQuery.of(context).size),
+      ],
+    );
   }
 }

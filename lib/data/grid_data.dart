@@ -32,12 +32,14 @@ class GridData {
   // 打破星星动画和移动星星动画的函数
   EffectCreator effectCreator = NilEffectCreator();
 
-  // 临时调试
+  // 临时调试，后续关卡为, 20500, 24000
   var goals = <int>[1000, 2500, 4000, 5500, 7500, 9000, 11000, 13500, 16500];
 
   // 游戏状态，0为初始进入游戏，1为游戏中，2为游戏结束，3为游戏中等待下一关，4为游戏结算画面
   // 状态2已不再使用
   int gameState = 0;
+
+  double grid = 0;
 
   void init() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -113,7 +115,7 @@ class GridData {
       for (int j = 0; j < UX.col; j++) {
         grids[i][j].setValue(random.nextInt(5) + 1);
         var pos = Point<double>(j.toDouble(), i.toDouble());
-        grids[i][j].updatePosition(pos);
+        grids[i][j].updatePosition(pos, grid);
       }
     }
   }
@@ -149,8 +151,9 @@ class GridData {
     return gameState == 3;
   }
 
-  double obtainGrid(double width) {
-    return (width - (GridData.gap * (UX.col + 1))) / UX.col;
+  // this function would called before game start
+  void initGridSize(double width) {
+    grid = (width - (GridData.gap * (UX.col + 1))) / UX.col;
   }
 
   double obtainHeight(double grid) {
@@ -166,7 +169,7 @@ class GridData {
       return false;
     }
     // 查找相连的同颜色的星星
-    var sameColors = findSameColors(starGrid, starGrid.toColorPoint());
+    var sameColors = findSameColors(starGrid);
     debugPrint('onTap $dx $dy, num: ${sameColors.length}');
     if (sameColors.length < 2) {
       return false;
@@ -177,7 +180,13 @@ class GridData {
       return false;
     }
     // 创建消灭的星星的动画；标记需要移动的星星，并创建星星移动位置的动画
-    effectCreator.createEffect(sameColors, brokeGrids(sameColors));
+    var random = Random();
+    for (var point in sameColors) {
+      point.initValue(grid, random);
+      point.initValue(grid, random);
+    }
+    effectCreator.createEffect(
+        starGrid.color, sameColors, brokeGrids(sameColors));
     // 结算分数
     var value = sameColors.length * sameColors.length * 5;
     scoreLevel += value;
@@ -231,10 +240,9 @@ class GridData {
   }
 
   // 查找与被点击格子相连的相同颜色的格子
-  List<ColorPoint> findSameColors(StarGrid starGrid, ColorPoint colorPoint) {
-    int color = colorPoint.value;
+  List<ColorPoint> findSameColors(StarGrid starGrid) {
     List<ColorPoint> list = <ColorPoint>[];
-    list.add(colorPoint);
+    list.add(starGrid.toColorPoint());
     isNewPoint(Point<int> point) {
       if (!grids[point.y][point.x].isSameColor(starGrid)) {
         return false;
@@ -252,19 +260,19 @@ class GridData {
     while (index < list.length) {
       var now = list[index];
       index++;
-      var top = ColorPoint(now.x, now.y - 1, color);
+      var top = ColorPoint(now.x, now.y - 1);
       if (top.y >= 0 && isNewPoint(top)) {
         list.add(top);
       }
-      var bottom = ColorPoint(now.x, now.y + 1, color);
+      var bottom = ColorPoint(now.x, now.y + 1);
       if (bottom.y < UX.row && isNewPoint(bottom)) {
         list.add(bottom);
       }
-      var left = ColorPoint(now.x - 1, now.y, color);
+      var left = ColorPoint(now.x - 1, now.y);
       if (left.x >= 0 && isNewPoint(left)) {
         list.add(left);
       }
-      var right = ColorPoint(now.x + 1, now.y, color);
+      var right = ColorPoint(now.x + 1, now.y);
       if (right.x < UX.col && isNewPoint(right)) {
         list.add(right);
       }
@@ -331,7 +339,8 @@ class GridData {
 abstract class EffectCreator {
   bool isEffectEnable();
 
-  void createEffect(List<ColorPoint> breakList, List<StarGrid> movingList);
+  void createEffect(
+      (int, int) color, List<ColorPoint> breakList, List<StarGrid> movingList);
 }
 
 class NilEffectCreator implements EffectCreator {
@@ -340,5 +349,5 @@ class NilEffectCreator implements EffectCreator {
   bool isEffectEnable() => false;
 
   @override
-  void createEffect(List<ColorPoint> breakList, List<StarGrid> movingList) {}
+  void createEffect((int, int) _, List<ColorPoint> _b, List<StarGrid> _m) {}
 }

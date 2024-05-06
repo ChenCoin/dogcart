@@ -1,12 +1,12 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 
-// 绘制五角星
+// 绘制五角星，rot为角度，最大为360
 void drawStar(Path path, double R, double r, double dx, double dy, double rot) {
   // 五角星的角度
   deg2Rad(int i) => (36 * i - rot) / 180 * pi;
   path.reset();
-  path.moveTo(dx, dy - R);
+  path.moveTo(dx - sin(deg2Rad(10)) * R, dy - cos(deg2Rad(10)) * R);
   // 沿着10个点绘制路径
   for (int i = 1; i <= 10; i++) {
     double rad = i % 2 == 1 ? r : R;
