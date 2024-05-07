@@ -1,3 +1,4 @@
+import 'package:dogcart/view/scene_board.dart';
 import 'package:flutter/material.dart';
 import '../data/grid_data.dart';
 import 'effect_board.dart';
@@ -26,23 +27,30 @@ class _GameBoardState extends State<GameBoard> {
     var data = widget.data;
     double width = widget.width;
     double height = data.obtainHeight(data.grid);
+    var size = Size(width, height);
     return Stack(
       children: [
         RepaintBoundary(
           child: StarBoard(
-            size: Size(width, height),
+            size: size,
             data: data,
             callback: widget.callback,
           ),
         ),
-        Offstage(
-          offstage: data.gameState != 1,
-          child: RepaintBoundary(
-            child: EffectBoard(
-              size: Size(width, height),
-              data: data,
-              callback: () => setState(() {}),
-            ),
+        RepaintBoundary(
+          child: Stack(
+            children: [
+              Offstage(
+                offstage: data.gameState != 1,
+                child: EffectBoard(
+                  size: size,
+                  data: data,
+                  callback: () => setState(() {}),
+                ),
+              ),
+              if (data.gameState == 5 || data.gameState == 6)
+                SceneBoard(size: size, data: data),
+            ],
           ),
         ),
       ],

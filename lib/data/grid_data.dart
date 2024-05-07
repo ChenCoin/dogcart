@@ -35,8 +35,14 @@ class GridData {
   // 临时调试，后续关卡为, 20500, 24000
   var goals = <int>[1000, 2500, 4000, 5500, 7500, 9000, 11000, 13500, 16500];
 
-  // 游戏状态，0为初始进入游戏，1为游戏中，2为游戏结束，3为游戏中等待下一关，4为游戏结算画面
-  // 状态2已不再使用
+  // 游戏状态
+  // 0为初始进入游戏
+  // 1为游戏中
+  // 2为游戏结束(不再使用)
+  // 3为游戏中等待下一关
+  // 4为游戏结算画面
+  // 5为每一关开局动画
+  // 6为每一关结束动画
   int gameState = 0;
 
   double grid = 0;
@@ -51,21 +57,26 @@ class GridData {
     prefs.setInt(UX.highestScoreKey, highestScore);
   }
 
-  void start() {
-    gameState = 1;
+  void start(void Function(VoidCallback) callback) {
     score = 0;
     scoreLevel = 0;
     level = 0;
     goal = goals[level];
     fillGrids();
+
+    callback(() => gameState = 5);
+    Future.delayed(const Duration(milliseconds: UX.enterSceneDuration), () {
+      callback(() => gameState = 1);
+    });
   }
 
-  void end() async {
+  void end(void Function(VoidCallback) callback) async {
     gameState = 4;
     highestScore = max(score, highestScore);
     clearGrids();
     storeData();
     breakStarList.clear();
+    callback(() {});
   }
 
   void onViewInit(EffectCreator effectCreator) {
@@ -85,12 +96,15 @@ class GridData {
     breakStarList.remove(list);
   }
 
-  void nextLevel() {
-    gameState = 1;
+  void nextLevel(void Function(VoidCallback) callback) {
     level++;
     goal = queryLevelGoal(level);
     scoreLevel = 0;
     fillGrids();
+    callback(() => gameState = 5);
+    Future.delayed(const Duration(milliseconds: UX.enterSceneDuration), () {
+      callback(() => gameState = 1);
+    });
   }
 
   void onLevelFinish() {

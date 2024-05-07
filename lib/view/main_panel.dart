@@ -20,10 +20,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _onBtnTap() {
     if (data.gameState == 0 || data.gameState == 4) {
-      data.start();
+      data.start(setState);
       return;
     }
-    data.end();
+    data.end(setState);
   }
 
   void _onLevelFinish() {
@@ -42,10 +42,10 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _onLevelNext() {
-    if(!data.isGameRunning()){
+    if (!data.isGameRunning()) {
       return;
     }
-    data.nextLevel();
+    data.nextLevel(setState);
   }
 
   @override
@@ -84,9 +84,7 @@ class _MyHomePageState extends State<MyHomePage> {
               if (data.isGameSettlement()) ...[
                 LevelPanel(
                   data: data,
-                  callback: () => setState(() {
-                    _onLevelNext();
-                  }),
+                  callback: _onLevelNext,
                 ),
               ]
             ],
@@ -160,9 +158,7 @@ class _MyHomePageState extends State<MyHomePage> {
         width: 160,
         height: 42,
         child: FilledButton(
-          onPressed: () => setState(() {
-            _onBtnTap();
-          }),
+          onPressed: _onBtnTap,
           child: Text(
             _gameStateBtnLabel(context),
             style: const TextStyle(fontSize: 18),

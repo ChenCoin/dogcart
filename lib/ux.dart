@@ -17,6 +17,12 @@ class UX {
   // duration of break star
   static const breakStarDuration = 1200;
 
+  // duration of enter level
+  static const enterSceneDuration = 2000;
+
+  // duration of exit level
+  static const exitSceneDuration = 2000;
+
   // mac environment
   static const debugMode = false;
 }
