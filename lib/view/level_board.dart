@@ -39,7 +39,7 @@ class _LevelPanelState extends State<LevelPanel> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         boxShadow: const [
-          BoxShadow(color: Colors.black38, offset: Offset(2, 2), blurRadius: 16)
+          BoxShadow(color: Colors.black12, offset: Offset(1, 1), blurRadius: 8)
         ],
       ),
       padding: const EdgeInsets.only(top: 32),

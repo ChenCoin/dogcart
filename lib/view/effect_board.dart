@@ -62,29 +62,27 @@ class _EffectBoardState extends State<EffectBoard>
     var cache = cachePair.getAnimationCache();
     cache.using = true;
     var animCache = cache.getAnimationCache();
-
-    var breakController = animCache.bc;
-    var breakAnim = animCache.ba;
-
-    // anim duration of 'moving star' should short than 'break star'
-    var breakStars = BreakStarList(breakList, breakAnim, color);
+    // break star animation
+    var breakStars = BreakStarList(breakList, animCache.ba, color);
     widget.data.addBreakStarList(breakStars);
     cache.addBreakListener((status) {
       if (status == AnimationStatus.completed) {
-        cache.using = false;
-        cache.removeListener();
+        if (UX.breakStarDuration >= UX.moveStarDuration) {
+          cache.endAnimation();
+        }
         widget.data.removeBreakStarList(breakStars);
       }
     });
-
-    var movingController = animCache.mc;
+    // moving star animation
     var movingAnim = animCache.ma;
     for (var item in movingList) {
       item.willMove(movingAnim);
     }
     cache.addMovingListener((status) {
       if (status == AnimationStatus.completed) {
-        // 结束移动星星的动画
+        if (UX.breakStarDuration < UX.moveStarDuration) {
+          cache.endAnimation();
+        }
         for (var item in movingList) {
           if (item.anim == movingAnim) {
             item.endMove();
@@ -93,9 +91,8 @@ class _EffectBoardState extends State<EffectBoard>
         widget.callback();
       }
     });
-
-    breakController.forward();
-    movingController.forward();
+    // start animation
+    cache.startAnimation();
   }
 
   void sync() {
@@ -139,7 +136,7 @@ class _MyPainter extends CustomPainter {
       int color = item.color.$1;
       List<ColorPoint> list = item.list;
       for (var colorPoint in list) {
-        // 画五角星
+        // draw star
         var animValue = 100 - item.anim.value / 2; // 100 -> 50
         double R = (grid / 2 - 2) * animValue / 100;
         double r = (grid / 4) * animValue / 100;
@@ -160,7 +157,7 @@ class _MyPainter extends CustomPainter {
   void drawMovingStar(Canvas canvas) {
     int gap = GridData.gap;
     double grid = data.grid;
-    // 绘制格子
+    // draw grids
     for (int dy = 0; dy < UX.row; dy++) {
       for (int dx = 0; dx < UX.col; dx++) {
         var gridPoint = data.grids[dy][dx];
@@ -177,13 +174,13 @@ class _MyPainter extends CustomPainter {
         gridPaint.color = Color(color.$2);
         starPaint.color = Color(color.$1);
 
-        // 画圆角方块
+        // draw round grid
         var left = grid * j + gap * (j + 1);
         var top = grid * i + gap * (i + 1);
         drawSmoothRoundRect(path, left, top, grid, grid, 12);
         canvas.drawPath(path, gridPaint);
 
-        // 画五角星
+        // draw star
         left = left + grid / 2;
         top = top + grid / 2;
         drawStar(path, grid / 2 - 2, grid / 4, left, top, 0);
@@ -195,12 +192,16 @@ class _MyPainter extends CustomPainter {
 }
 
 class AnimationPair {
+  // animation controller of moving star
   AnimationController mc;
 
+  // animation value of moving star
   Animation<double> ma;
 
+  // animation controller of break star
   AnimationController bc;
 
+  // animation value of break star
   Animation<double> ba;
 
   AnimationPair(this.mc, this.ma, this.bc, this.ba);
@@ -225,7 +226,7 @@ class _Cache {
     if (_cache == null) {
       Duration duration = const Duration(milliseconds: UX.moveStarDuration);
       var controller = AnimationController(duration: duration, vsync: ticker);
-      // animation用于获取数值
+      // animation was using for the dynamically value
       var curve =
           CurvedAnimation(parent: controller, curve: Curves.easeOutQuad);
       var anim = Tween(begin: 0.0, end: 100.0).animate(curve)
@@ -233,7 +234,7 @@ class _Cache {
 
       Duration duration2 = const Duration(milliseconds: UX.breakStarDuration);
       var controller2 = AnimationController(duration: duration2, vsync: ticker);
-      // animation用于获取数值
+      // animation was using for the dynamically value
       var curve2 =
           CurvedAnimation(parent: controller2, curve: Curves.easeOutQuad);
       var anim2 = Tween(begin: 0.0, end: 100.0).animate(curve2)
@@ -256,7 +257,13 @@ class _Cache {
     _cache?.bc.addStatusListener(_bCacheListener);
   }
 
-  void removeListener() {
+  void startAnimation() {
+    _cache?.mc.forward();
+    _cache?.bc.forward();
+  }
+
+  void endAnimation() {
+    using = false;
     _cache?.mc.removeStatusListener(_mCacheListener);
     _cache?.bc.removeStatusListener(_bCacheListener);
   }
@@ -280,14 +287,15 @@ class _CachePair {
     return false;
   }
 
-  // 调用这个接口前，先用isAnyEnable判断存在一个可用的anim，不考虑所有anim都使用中的场景
+  // isAnyEnable should be called before called this function.
+  // The case of all anim using is not support
   _Cache getAnimationCache() {
     for (var item in _list) {
       if (!item.using) {
         return item;
       }
     }
-    // 这个返回值会导致异常
+    // error case
     return _list[0];
   }
 

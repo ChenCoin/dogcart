@@ -74,7 +74,7 @@ class _MyPainter extends CustomPainter {
     double grid = data.grid;
     drawBackground(canvas, rect, grid);
 
-    // 绘制格子
+    // draw grids
     for (int i = 0; i < UX.row; i++) {
       for (int j = 0; j < UX.col; j++) {
         var gridPoint = data.grids[i][j];
@@ -84,13 +84,13 @@ class _MyPainter extends CustomPainter {
         (int, int) color = gridPoint.color;
         gridPaint.color = Color(color.$2);
 
-        // 画圆角方块
+        // draw round grid
         var left = gridPoint.left;
         var top = gridPoint.top;
         drawSmoothRoundRect(path, left, top, grid, grid, 12);
         canvas.drawPath(path, gridPaint);
 
-        // 画五角星
+        // draw star
         left = left + grid / 2;
         top = top + grid / 2;
         drawStar(path, grid / 2 - 2, grid / 4, left, top, 0);
@@ -105,7 +105,7 @@ class _MyPainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 
   void drawBackground(Canvas canvas, Rect rect, double grid) {
-    // 画横线
+    // draw row line
     int floor = (GridData.gap / 2).floor();
     for (int i = 0; i <= UX.row; i++) {
       double dy = rect.top + (grid + GridData.gap) * i + floor;
@@ -113,7 +113,7 @@ class _MyPainter extends CustomPainter {
           Offset(rect.right - floor * 2 + 2, dy), bgrPaint);
     }
 
-    // 画竖线
+    // draw col line
     for (int i = 0; i <= UX.col; i++) {
       double dx = rect.left + (grid + GridData.gap) * i + floor;
       canvas.drawLine(Offset(dx, rect.top + floor),

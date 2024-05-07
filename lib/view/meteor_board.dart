@@ -30,9 +30,7 @@ class _MeteorState extends State<MeteorBoard> with TickerProviderStateMixin {
 
   late Animation<double> anim;
 
-  bool shouldDraw = false;
-
-  (double, double) animPosition = (0, 0);
+  AnimInfo animInfo = AnimInfo(false, 0, 0);
 
   @override
   void initState() {
@@ -48,7 +46,7 @@ class _MeteorState extends State<MeteorBoard> with TickerProviderStateMixin {
       });
     controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
-        shouldDraw = false;
+        animInfo.active = false;
       }
     });
   }
@@ -57,7 +55,7 @@ class _MeteorState extends State<MeteorBoard> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return CustomPaint(
       size: widget.size,
-      painter: _MyPainter(anim, shouldDraw, animPosition),
+      painter: _MyPainter(anim, animInfo),
     );
   }
 
@@ -72,11 +70,11 @@ class _MeteorState extends State<MeteorBoard> with TickerProviderStateMixin {
     var random = Random();
     var value = random.nextInt(_probability);
     if (value != 0) {
-      shouldDraw = false;
+      animInfo.active = false;
       return;
     }
-    shouldDraw = true;
-    animPosition = createAnimPair(random);
+    animInfo.active = true;
+    animInfo.setValue(createAnimPair(random));
     controller.reset();
     controller.forward();
   }
@@ -107,19 +105,17 @@ class _MyPainter extends CustomPainter {
 
   Animation<double> anim;
 
-  bool shouldDraw = false;
+  AnimInfo animInfo;
 
-  (double, double) animPosition = (0, 0);
-
-  _MyPainter(this.anim, this.shouldDraw, this.animPosition);
+  _MyPainter(this.anim, this.animInfo);
 
   @override
   void paint(Canvas canvas, Size size) {
-    if (!shouldDraw) {
+    if (!animInfo.active) {
       return;
     }
-    var startX = animPosition.$1;
-    double dx = (animPosition.$2 - startX) * anim.value / 100 + startX;
+    var startX = animInfo.top;
+    double dx = (animInfo.bottom - startX) * anim.value / 100 + startX;
     double dy = (size.height + grid * 2) * anim.value / 100 - grid;
     var rot = 360 * anim.value / 32;
     drawStar(_path, grid / 2 - 2, grid / 4, dx, dy, rot);
@@ -127,5 +123,18 @@ class _MyPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => animInfo.active;
+}
+
+class AnimInfo {
+  bool active;
+  double top;
+  double bottom;
+
+  AnimInfo(this.active, this.top, this.bottom);
+
+  void setValue((double, double) value) {
+    top = value.$1;
+    bottom = value.$2;
+  }
 }

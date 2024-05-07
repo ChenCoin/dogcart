@@ -39,10 +39,10 @@ class BreakStarList {
 }
 
 class StarGrid {
-  // 星星所在位置，创建对象时就固定下来
+  // the position of star is a static value, it init at the object was new
   final Point<double> _location;
 
-  // 星星当前所在位置。移动星星时，由_position移动到_location
+  // the position of star. when moving, it would from _position to _location
   Point<double> _position = const Point<double>(0, 0);
 
   int _value = 0;
@@ -122,7 +122,7 @@ class StarGrid {
     _position = _location;
   }
 
-  // 在每一关卡开始时，刷新星星的位置信息
+  // refresh the position of star when level start
   void updatePosition(Point<double> pos, double grid) {
     _position = pos;
     left = grid * pos.x + GridData.gap * (pos.x + 1);
@@ -138,7 +138,7 @@ class StarGrid {
   }
 }
 
-// 颜色匹配
+// color map
 (int, int) _colorMap(int number) {
   switch (number) {
     case 1:

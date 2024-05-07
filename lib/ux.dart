@@ -1,19 +1,22 @@
 class UX {
-  // 星星格子的列数
+  // col of star grids
   static const int col = 10;
 
-  // 星星格子的行数
+  // row of star grids
   static const int row = 11;
 
-  // 动画的同一个时间的处理数，决定同时进行“消除星星”动作的个数
+  // the key to store highestScore
+  static const String highestScoreKey = 'dogcart.highestScore';
+
+  // the max animation of break star
   static const animationCacheSize = 4;
 
-  // 星星移动动画持续时间
+  // duration of moving star
   static const moveStarDuration = 500;
 
-  // 星星破碎动画持续时间
+  // duration of break star
   static const breakStarDuration = 1200;
 
-  // mac环境
+  // mac environment
   static const debugMode = false;
 }

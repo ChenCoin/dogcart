@@ -30,7 +30,7 @@ class GridData {
   List<BreakStarList> breakStarList = <BreakStarList>[];
 
   // 打破星星动画和移动星星动画的函数
-  EffectCreator effectCreator = NilEffectCreator();
+  EffectCreator _effectCreator = NilEffectCreator();
 
   // 临时调试，后续关卡为, 20500, 24000
   var goals = <int>[1000, 2500, 4000, 5500, 7500, 9000, 11000, 13500, 16500];
@@ -43,12 +43,12 @@ class GridData {
 
   void init() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    highestScore = prefs.getInt('dogcart.highestScore') ?? 0;
+    highestScore = prefs.getInt(UX.highestScoreKey) ?? 0;
   }
 
   void storeData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setInt('dogcart.highestScore', highestScore);
+    prefs.setInt(UX.highestScoreKey, highestScore);
   }
 
   void start() {
@@ -69,11 +69,11 @@ class GridData {
   }
 
   void onViewInit(EffectCreator effectCreator) {
-    this.effectCreator = effectCreator;
+    _effectCreator = effectCreator;
   }
 
   void onDispose() {
-    effectCreator = NilEffectCreator();
+    _effectCreator = NilEffectCreator();
     breakStarList.clear();
   }
 
@@ -175,7 +175,7 @@ class GridData {
       return false;
     }
     // 动画不可用，点击无效
-    if (!effectCreator.isEffectEnable()) {
+    if (!_effectCreator.isEffectEnable()) {
       debugPrint('tap cancel as animation running');
       return false;
     }
@@ -185,7 +185,7 @@ class GridData {
       point.initValue(grid, random);
       point.initValue(grid, random);
     }
-    effectCreator.createEffect(
+    _effectCreator.createEffect(
         starGrid.color, sameColors, brokeGrids(sameColors));
     // 结算分数
     var value = sameColors.length * sameColors.length * 5;
