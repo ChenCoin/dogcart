@@ -63,11 +63,11 @@ class GridData {
     level = 0;
     goal = goals[level];
     fillGrids();
-
-    callback(() => gameState = 5);
-    Future.delayed(const Duration(milliseconds: UX.enterSceneDuration), () {
-      callback(() => gameState = 1);
-    });
+    callback(() => gameState = 1);
+    // callback(() => gameState = 5);
+    // Future.delayed(const Duration(milliseconds: UX.enterSceneDuration), () {
+    //   callback(() => gameState = 1);
+    // });
   }
 
   void end(void Function(VoidCallback) callback) async {
@@ -101,10 +101,11 @@ class GridData {
     goal = queryLevelGoal(level);
     scoreLevel = 0;
     fillGrids();
-    callback(() => gameState = 5);
-    Future.delayed(const Duration(milliseconds: UX.enterSceneDuration), () {
-      callback(() => gameState = 1);
-    });
+    callback(() => gameState = 1);
+    // callback(() => gameState = 5);
+    // Future.delayed(const Duration(milliseconds: UX.enterSceneDuration), () {
+    //   callback(() => gameState = 1);
+    // });
   }
 
   void onLevelFinish() {
