@@ -1,6 +1,10 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 
+import '../data/grid_data.dart';
+import '../data/grid_point.dart';
+import '../ux.dart';
+
 // 绘制五角星，rot为角度，最大为360
 void drawStar(Path path, double R, double r, double dx, double dy, double rot) {
   // 五角星的角度
@@ -36,23 +40,39 @@ void drawSmoothRoundRect(Path path, double left, double top, double width,
   path.close();
 }
 
-class NumberDrawer {
-  static const double fontSize = 24;
+void drawMovingStar(Canvas canvas, GridData data, Path path, Paint gridPaint,
+    Paint starPaint, double Function(StarGrid) getAnim) {
+  int gap = GridData.gap;
+  double grid = data.grid;
+  // draw grids
+  for (int dy = 0; dy < UX.row; dy++) {
+    for (int dx = 0; dx < UX.col; dx++) {
+      var gridPoint = data.grids[dy][dx];
+      if (!gridPoint.isMoving()) {
+        continue;
+      }
+      var anim = getAnim(gridPoint);
+      var posY = gridPoint.getPosition().y;
+      var i = posY + (dy - posY) * anim / 100;
+      var posX = gridPoint.getPosition().x;
+      var j = posX + (dx - posX) * anim / 100;
 
-  final paint = TextPainter()
-    ..textAlign = TextAlign.center
-    ..textDirection = TextDirection.ltr;
+      (int, int) color = gridPoint.color;
+      gridPaint.color = Color(color.$2);
+      starPaint.color = Color(color.$1);
 
-  final style = const TextStyle(
-    color: Colors.yellow,
-    fontSize: fontSize,
-    fontWeight: FontWeight.bold,
-  );
+      // draw round grid
+      var left = grid * j + gap * (j + 1);
+      var top = grid * i + gap * (i + 1);
+      drawSmoothRoundRect(path, left, top, grid, grid, 12);
+      canvas.drawPath(path, gridPaint);
 
-  void drawNumber(Canvas canvas, double dx, double dy, String text) {
-    // 画数字
-    paint.text = TextSpan(text: text, style: style);
-    paint.layout(minWidth: 60);
-    paint.paint(canvas, Offset(dx - 30, dy));
+      // draw star
+      left = left + grid / 2;
+      top = top + grid / 2;
+      drawStar(path, grid / 2 - 2, grid / 4, left, top, 0);
+      canvas.drawShadow(path, const Color(0xFF808080), 3, false);
+      canvas.drawPath(path, starPaint);
+    }
   }
 }

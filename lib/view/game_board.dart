@@ -30,11 +30,18 @@ class _GameBoardState extends State<GameBoard> {
     var size = Size(width, height);
     return Stack(
       children: [
-        RepaintBoundary(
-          child: StarBoard(
-            size: size,
-            data: data,
-            callback: widget.callback,
+        SizedBox(
+          width: width,
+          height: height,
+        ),
+        Visibility(
+          visible: data.gameState == 1,
+          child: RepaintBoundary(
+            child: StarBoard(
+              size: size,
+              data: data,
+              callback: widget.callback,
+            ),
           ),
         ),
         RepaintBoundary(

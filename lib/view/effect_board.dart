@@ -105,8 +105,6 @@ class _MyPainter extends CustomPainter {
 
   final path = Path();
 
-  final numberDrawer = NumberDrawer();
-
   final starPaint = Paint()
     ..isAntiAlias = true
     ..style = PaintingStyle.fill;
@@ -119,7 +117,8 @@ class _MyPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    drawMovingStar(canvas);
+    drawMovingStar(
+        canvas, data, path, gridPaint, starPaint, (p) => p.anim?.value ?? 0);
     drawBreakStar(canvas);
   }
 
@@ -150,42 +149,6 @@ class _MyPainter extends CustomPainter {
           drawStar(path, R, r, dx, dy, rot);
           canvas.drawPath(path, starPaint);
         }
-      }
-    }
-  }
-
-  void drawMovingStar(Canvas canvas) {
-    int gap = GridData.gap;
-    double grid = data.grid;
-    // draw grids
-    for (int dy = 0; dy < UX.row; dy++) {
-      for (int dx = 0; dx < UX.col; dx++) {
-        var gridPoint = data.grids[dy][dx];
-        if (!gridPoint.isMoving()) {
-          continue;
-        }
-        var anim = gridPoint.anim?.value ?? 0;
-        var posY = gridPoint.getPosition().y;
-        var i = posY + (dy - posY) * anim / 100;
-        var posX = gridPoint.getPosition().x;
-        var j = posX + (dx - posX) * anim / 100;
-
-        (int, int) color = gridPoint.color;
-        gridPaint.color = Color(color.$2);
-        starPaint.color = Color(color.$1);
-
-        // draw round grid
-        var left = grid * j + gap * (j + 1);
-        var top = grid * i + gap * (i + 1);
-        drawSmoothRoundRect(path, left, top, grid, grid, 12);
-        canvas.drawPath(path, gridPaint);
-
-        // draw star
-        left = left + grid / 2;
-        top = top + grid / 2;
-        drawStar(path, grid / 2 - 2, grid / 4, left, top, 0);
-        canvas.drawShadow(path, const Color(0xFF808080), 3, false);
-        canvas.drawPath(path, starPaint);
       }
     }
   }

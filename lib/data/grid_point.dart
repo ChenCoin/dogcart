@@ -125,8 +125,12 @@ class StarGrid {
   // refresh the position of star when level start
   void updatePosition(Point<double> pos, double grid) {
     _position = pos;
-    left = grid * pos.x + GridData.gap * (pos.x + 1);
-    top = grid * pos.y + GridData.gap * (pos.y + 1);
+    left = grid * _location.x + GridData.gap * (_location.x + 1);
+    top = grid * _location.y + GridData.gap * (_location.y + 1);
+  }
+
+  void resetPosition() {
+    _position = _location;
   }
 
   Point<double> getPosition() {

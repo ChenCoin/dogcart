@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
   Widget home(BuildContext context) {
     return Stack(
       children: [
-        if (UX.debugMode)
+        if (UX.darkMode)
           Container(decoration: const BoxDecoration(color: Color(0xD0000000))),
         MeteorBoard(size: MediaQuery.of(context).size),
       ],

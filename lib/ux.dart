@@ -23,6 +23,6 @@ class UX {
   // duration of exit level
   static const exitSceneDuration = 2000;
 
-  // mac environment
-  static const debugMode = false;
+  // dark mode when debug
+  static const darkMode = false;
 }

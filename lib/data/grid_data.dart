@@ -59,15 +59,8 @@ class GridData {
 
   void start(void Function(VoidCallback) callback) {
     score = 0;
-    scoreLevel = 0;
     level = 0;
-    goal = goals[level];
-    fillGrids();
-    callback(() => gameState = 1);
-    // callback(() => gameState = 5);
-    // Future.delayed(const Duration(milliseconds: UX.enterSceneDuration), () {
-    //   callback(() => gameState = 1);
-    // });
+    onLevelStart(callback);
   }
 
   void end(void Function(VoidCallback) callback) async {
@@ -77,6 +70,22 @@ class GridData {
     storeData();
     breakStarList.clear();
     callback(() {});
+  }
+
+  void nextLevel(void Function(VoidCallback) callback) {
+    level++;
+    onLevelStart(callback);
+  }
+
+  void onLevelStart(void Function(VoidCallback) callback) {
+    goal = queryLevelGoal(level);
+    scoreLevel = 0;
+    fillGrids();
+    callback(() => gameState = 1);
+    // callback(() => gameState = 5);
+    // Future.delayed(const Duration(milliseconds: UX.enterSceneDuration), () {
+    //   callback(() => gameState = 1);
+    // });
   }
 
   void onViewInit(EffectCreator effectCreator) {
@@ -94,18 +103,6 @@ class GridData {
 
   void removeBreakStarList(BreakStarList list) {
     breakStarList.remove(list);
-  }
-
-  void nextLevel(void Function(VoidCallback) callback) {
-    level++;
-    goal = queryLevelGoal(level);
-    scoreLevel = 0;
-    fillGrids();
-    callback(() => gameState = 1);
-    // callback(() => gameState = 5);
-    // Future.delayed(const Duration(milliseconds: UX.enterSceneDuration), () {
-    //   callback(() => gameState = 1);
-    // });
   }
 
   void onLevelFinish() {
@@ -129,7 +126,9 @@ class GridData {
     for (int i = 0; i < UX.row; i++) {
       for (int j = 0; j < UX.col; j++) {
         grids[i][j].setValue(random.nextInt(5) + 1);
-        var pos = Point<double>(j.toDouble(), i.toDouble());
+        // double dy = i - 10 * sqrt(random.nextDouble());
+        double dy = i.toDouble();
+        var pos = Point<double>(j.toDouble(), dy);
         grids[i][j].updatePosition(pos, grid);
       }
     }
@@ -139,6 +138,14 @@ class GridData {
     for (int i = 0; i < UX.row; i++) {
       for (int j = 0; j < UX.col; j++) {
         grids[i][j].clear();
+      }
+    }
+  }
+
+  void endEnterAnim() {
+    for (int i = 0; i < UX.row; i++) {
+      for (int j = 0; j < UX.col; j++) {
+        grids[i][j].resetPosition();
       }
     }
   }

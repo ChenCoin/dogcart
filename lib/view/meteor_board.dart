@@ -61,9 +61,9 @@ class _MeteorState extends State<MeteorBoard> with TickerProviderStateMixin {
 
   @override
   void dispose() {
+    controller.dispose();
     super.dispose();
     _timer.cancel();
-    controller.dispose();
   }
 
   void onTick(Timer timer) {
