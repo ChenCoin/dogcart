@@ -23,9 +23,10 @@ class _SceneBoardState extends State<SceneBoard> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    var duration = const Duration(seconds: UX.enterSceneDuration);
+    // 减少100毫秒，规避动画缺失的问题
+    var duration = const Duration(milliseconds: UX.enterSceneDuration - 100);
     controller = AnimationController(duration: duration, vsync: this);
-    var curve = CurvedAnimation(parent: controller, curve: Curves.easeOutQuad);
+    var curve = CurvedAnimation(parent: controller, curve: Curves.easeOutCubic);
     anim = Tween(begin: 0.0, end: 100.0).animate(curve)
       ..addListener(() {
         setState(() {});
@@ -67,6 +68,7 @@ class _MyPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
+    debugPrint('anim ${anim.value}');
     drawMovingStar(canvas, data, path, gridPaint, starPaint, (p) => anim.value);
   }
 

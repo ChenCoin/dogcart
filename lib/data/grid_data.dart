@@ -81,9 +81,11 @@ class GridData {
     goal = queryLevelGoal(level);
     scoreLevel = 0;
     fillGrids();
-    // callback(() => gameState = 1);
     callback(() => gameState = 5);
     Future.delayed(const Duration(milliseconds: UX.enterSceneDuration), () {
+      if (gameState != 5) {
+        return;
+      }
       endEnterAnim();
       callback(() => gameState = 1);
     });
@@ -127,7 +129,7 @@ class GridData {
     for (int i = 0; i < UX.row; i++) {
       for (int j = 0; j < UX.col; j++) {
         grids[i][j].setValue(random.nextInt(5) + 1);
-        double dy = i - 10 * sqrt(random.nextDouble());
+        double dy = i - grid * sqrt(random.nextDouble()) / 10;
         // double dy = i.toDouble();
         var pos = Point<double>(j.toDouble(), dy);
         grids[i][j].updatePosition(pos, grid);

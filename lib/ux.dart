@@ -18,7 +18,7 @@ class UX {
   static const breakStarDuration = 1200;
 
   // duration of enter level
-  static const enterSceneDuration = 2000;
+  static const enterSceneDuration = 1000;
 
   // duration of exit level
   static const exitSceneDuration = 2000;
