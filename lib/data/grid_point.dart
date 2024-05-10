@@ -17,9 +17,11 @@ class ColorPoint extends Point<int> {
     double left = grid * x + GridData.gap * (x + 1);
     double top = grid * y + GridData.gap * (y + 1);
     start = (left + grid / 2, top + grid / 2);
-
-    probability.add(createEndPoint(grid, random));
-    probability.add(createEndPoint(grid, random));
+    probability.clear();
+    var max = random.nextInt(3);
+    for (var i = 0; i < max + 1; i++) {
+      probability.add(createEndPoint(grid, random));
+    }
   }
 
   (double, double) createEndPoint(double grid, Random random) {

@@ -205,7 +205,6 @@ class GridData {
     var random = Random();
     for (var point in sameColors) {
       point.initValue(grid, random);
-      point.initValue(grid, random);
     }
     _effectCreator.createEffect(
         starGrid.color, sameColors, brokeGrids(sameColors));
