@@ -68,8 +68,10 @@ class _MyPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    debugPrint('anim ${anim.value}');
-    drawMovingStar(canvas, data, path, gridPaint, starPaint, (p) => anim.value);
+    if (data.gameState == 5) {
+      drawMovingStar(
+          canvas, data, path, gridPaint, starPaint, (p) => anim.value);
+    }
   }
 
   @override

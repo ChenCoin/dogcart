@@ -64,12 +64,21 @@ class GridData {
   }
 
   void end(void Function(VoidCallback) callback) async {
-    gameState = 4;
+    if (gameState != 1 && gameState != 3) {
+      return;
+    }
+    gameState = 6;
     highestScore = max(score, highestScore);
     clearGrids();
     storeData();
     breakStarList.clear();
     callback(() {});
+    Future.delayed(const Duration(milliseconds: UX.exitSceneDuration), () {
+      if (gameState != 6) {
+        return;
+      }
+      callback(() => gameState = 4);
+    });
   }
 
   void nextLevel(void Function(VoidCallback) callback) {
@@ -83,10 +92,10 @@ class GridData {
     fillGrids();
     callback(() => gameState = 5);
     Future.delayed(const Duration(milliseconds: UX.enterSceneDuration), () {
+      endEnterAnim();
       if (gameState != 5) {
         return;
       }
-      endEnterAnim();
       callback(() => gameState = 1);
     });
   }
@@ -141,6 +150,7 @@ class GridData {
     for (int i = 0; i < UX.row; i++) {
       for (int j = 0; j < UX.col; j++) {
         grids[i][j].clear();
+        grids[i][j].resetPosition();
       }
     }
   }
