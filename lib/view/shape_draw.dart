@@ -87,7 +87,6 @@ void drawBreakStar(Canvas canvas, GridData data, Path path, Paint starPaint,
     if (anim.status != AnimationStatus.forward) {
       continue;
     }
-    int color = item.color.$1;
     List<ColorPoint> list = item.list;
     for (var colorPoint in list) {
       // draw star
@@ -96,6 +95,7 @@ void drawBreakStar(Canvas canvas, GridData data, Path path, Paint starPaint,
       double r = (grid / 4) * animValue / 100;
       var rot = 360 * anim.value / 100;
       int alpha = 255 * (100 - anim.value) ~/ 100;
+      int color = colorPoint.color.$1;
       starPaint.color = Color(color).withAlpha(alpha);
 
       for (var end in colorPoint.probability) {

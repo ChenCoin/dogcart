@@ -69,18 +69,22 @@ class GridData {
     if (gameState != 1 && gameState != 3) {
       return;
     }
+
     gameState = 6;
+
     var starLast = queryStarLast();
     countLastStarAndScore(starLast.length);
-    highestScore = max(score, highestScore);
-    clearGrids();
-    storeData();
     var list = starLast.map((e) => e.toColorPoint()).toList();
     for (var point in list) {
-      point.initValue(grid, _random);
+      point.initValue(grid, _random, grids[point.y][point.x].color);
     }
     BreakStarList lastBreakStar = createBreakStarList(list);
     breakStarList.add(lastBreakStar);
+
+    highestScore = max(score, highestScore);
+    clearGrids();
+    storeData();
+
     callback(() {});
     Future.delayed(const Duration(milliseconds: UX.exitSceneDuration), () {
       breakStarList.clear(); // may error sometime
@@ -230,7 +234,7 @@ class GridData {
     }
     // 创建消灭的星星的动画；标记需要移动的星星，并创建星星移动位置的动画
     for (var point in sameColors) {
-      point.initValue(grid, _random);
+      point.initValue(grid, _random, starGrid.color);
     }
     _effectCreator.createEffect(
         starGrid.color, sameColors, brokeGrids(sameColors));

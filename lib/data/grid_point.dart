@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'grid_data.dart';
 
 class ColorPoint extends Point<int> {
+  (int, int) color = (0, 0);
+
   (double, double) start = (0, 0);
 
   (double, double) end = (0, 0);
@@ -13,7 +15,7 @@ class ColorPoint extends Point<int> {
 
   ColorPoint(super.x, super.y);
 
-  void initValue(double grid, Random random) {
+  void initValue(double grid, Random random, (int, int) color) {
     double left = grid * x + GridData.gap * (x + 1);
     double top = grid * y + GridData.gap * (y + 1);
     start = (left + grid / 2, top + grid / 2);
@@ -22,6 +24,7 @@ class ColorPoint extends Point<int> {
     for (var i = 0; i < max + 1; i++) {
       probability.add(createEndPoint(grid, random));
     }
+    this.color = color;
   }
 
   (double, double) createEndPoint(double grid, Random random) {
@@ -33,15 +36,13 @@ class ColorPoint extends Point<int> {
 class BreakStarList {
   List<ColorPoint> list;
 
-  (int, int) color = (0, 0);
-
   Animation<double>? anim;
 
-  BreakStarList(this.list, this.anim, this.color);
+  BreakStarList(this.list, this.anim);
 }
 
 BreakStarList createBreakStarList(List<ColorPoint> list) {
-  return BreakStarList(list, null, _colorMap(3));
+  return BreakStarList(list, null);
 }
 
 class StarGrid {

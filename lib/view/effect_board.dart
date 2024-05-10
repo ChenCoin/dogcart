@@ -63,7 +63,7 @@ class _EffectBoardState extends State<EffectBoard>
     cache.using = true;
     var animCache = cache.getAnimationCache();
     // break star animation
-    var breakStars = BreakStarList(breakList, animCache.ba, color);
+    var breakStars = BreakStarList(breakList, animCache.ba);
     widget.data.addBreakStarList(breakStars);
     cache.addBreakListener((status) {
       if (status == AnimationStatus.completed) {
