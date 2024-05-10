@@ -127,11 +127,13 @@ class StarGrid {
   // refresh the position of star when level start
   void updatePosition(Point<double> pos, double grid) {
     _position = pos;
+    _movingState = true;
     left = grid * _location.x + GridData.gap * (_location.x + 1);
     top = grid * _location.y + GridData.gap * (_location.y + 1);
   }
 
   void resetPosition() {
+    _movingState = false;
     _position = _location;
   }
 

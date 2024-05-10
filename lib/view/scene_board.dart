@@ -30,13 +30,7 @@ class _SceneBoardState extends State<SceneBoard> with TickerProviderStateMixin {
       ..addListener(() {
         setState(() {});
       });
-    controller.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        widget.data.endEnterAnim();
-      }
-    });
     controller.forward();
-    debugPrint('scene init state');
   }
 
   @override
