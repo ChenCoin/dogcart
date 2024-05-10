@@ -132,16 +132,30 @@ class GridData {
   }
 
   void onLevelFinish(void Function(VoidCallback) callback) {
-    var starCount = queryStarLast().length;
-    countLastStarAndScore(starCount);
-    if (score >= queryLevelGoal(level)) {
-      gameState = 3;
-    } else {
-      gameState = 4;
-      highestScore = max(score, highestScore);
-      storeData();
+    gameState = 6;
+    var starLast = queryStarLast();
+    countLastStarAndScore(starLast.length);
+    var list = starLast.map((e) => e.toColorPoint()).toList();
+    for (var point in list) {
+      point.initValue(grid, _random, grids[point.y][point.x].color);
     }
+    BreakStarList lastBreakStar = createBreakStarList(list);
+    breakStarList.add(lastBreakStar);
     callback(() {});
+    Future.delayed(const Duration(milliseconds: UX.exitSceneDuration), () {
+      breakStarList.clear(); // may error sometime
+      if (gameState != 6) {
+        return;
+      }
+      if (score >= queryLevelGoal(level)) {
+        gameState = 3;
+      } else {
+        gameState = 4;
+        highestScore = max(score, highestScore);
+        storeData();
+      }
+      callback(() {});
+    });
   }
 
   void countLastStarAndScore(int starCount) {
