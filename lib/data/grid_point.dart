@@ -35,9 +35,13 @@ class BreakStarList {
 
   (int, int) color = (0, 0);
 
-  Animation<double> anim;
+  Animation<double>? anim;
 
   BreakStarList(this.list, this.anim, this.color);
+}
+
+BreakStarList createBreakStarList(List<ColorPoint> list) {
+  return BreakStarList(list, null, _colorMap(3));
 }
 
 class StarGrid {

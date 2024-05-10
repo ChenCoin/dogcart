@@ -117,41 +117,14 @@ class _MyPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    drawMovingStar(
-        canvas, data, path, gridPaint, starPaint, (p) => p.anim?.value ?? 0);
-    drawBreakStar(canvas);
+    getMovingAnim(StarGrid p) => p.anim?.value ?? 0;
+    drawMovingStar(canvas, data, path, gridPaint, starPaint, getMovingAnim);
+    getBreakAnim(BreakStarList p) => p.anim!;
+    drawBreakStar(canvas, data, path, starPaint, getBreakAnim);
   }
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
-
-  void drawBreakStar(Canvas canvas) {
-    double grid = data.grid;
-    List<BreakStarList> breakStars = data.breakStarList;
-    for (var item in breakStars) {
-      if (item.anim.status != AnimationStatus.forward) {
-        continue;
-      }
-      int color = item.color.$1;
-      List<ColorPoint> list = item.list;
-      for (var colorPoint in list) {
-        // draw star
-        var animValue = 100 - item.anim.value / 2; // 100 -> 50
-        double R = (grid / 2 - 2) * animValue / 100;
-        double r = (grid / 4) * animValue / 100;
-        var rot = 360 * item.anim.value / 100;
-        int alpha = 255 * (100 - item.anim.value) ~/ 100;
-        starPaint.color = Color(color).withAlpha(alpha);
-
-        for (var end in colorPoint.probability) {
-          var dx = colorPoint.start.$1 + end.$1 * item.anim.value / 100;
-          var dy = colorPoint.start.$2 + end.$2 * item.anim.value / 100;
-          drawStar(path, R, r, dx, dy, rot);
-          canvas.drawPath(path, starPaint);
-        }
-      }
-    }
-  }
 }
 
 class AnimationPair {

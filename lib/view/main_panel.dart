@@ -27,9 +27,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _onLevelFinish() {
-    setState(() {
-      data.onLevelFinish();
-    });
+    data.onLevelFinish(setState);
   }
 
   void _onStateChange(bool isFinish) {

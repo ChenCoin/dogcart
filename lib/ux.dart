@@ -21,7 +21,7 @@ class UX {
   static const enterSceneDuration = 1200;
 
   // duration of exit level
-  static const exitSceneDuration = 1200;
+  static const exitSceneDuration = 2000;
 
   // dark mode when debug
   static const darkMode = false;

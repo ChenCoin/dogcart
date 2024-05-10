@@ -1,4 +1,5 @@
 import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 import '../data/grid_data.dart';
@@ -73,6 +74,36 @@ void drawMovingStar(Canvas canvas, GridData data, Path path, Paint gridPaint,
       drawStar(path, grid / 2 - 2, grid / 4, left, top, 0);
       canvas.drawShadow(path, const Color(0xFF808080), 3, false);
       canvas.drawPath(path, starPaint);
+    }
+  }
+}
+
+void drawBreakStar(Canvas canvas, GridData data, Path path, Paint starPaint,
+    Animation<double> Function(BreakStarList) getAnim) {
+  double grid = data.grid;
+  List<BreakStarList> breakStars = data.breakStarList;
+  for (var item in breakStars) {
+    Animation<double> anim = getAnim(item);
+    if (anim.status != AnimationStatus.forward) {
+      continue;
+    }
+    int color = item.color.$1;
+    List<ColorPoint> list = item.list;
+    for (var colorPoint in list) {
+      // draw star
+      var animValue = 100 - anim.value / 2; // 100 -> 50
+      double R = (grid / 2 - 2) * animValue / 100;
+      double r = (grid / 4) * animValue / 100;
+      var rot = 360 * anim.value / 100;
+      int alpha = 255 * (100 - anim.value) ~/ 100;
+      starPaint.color = Color(color).withAlpha(alpha);
+
+      for (var end in colorPoint.probability) {
+        var dx = colorPoint.start.$1 + end.$1 * anim.value / 100;
+        var dy = colorPoint.start.$2 + end.$2 * anim.value / 100;
+        drawStar(path, R, r, dx, dy, rot);
+        canvas.drawPath(path, starPaint);
+      }
     }
   }
 }

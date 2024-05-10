@@ -9,6 +9,8 @@ import 'grid_point.dart';
 class GridData {
   static const int gap = 4;
 
+  final _random = Random();
+
   late List<List<StarGrid>> grids = _createList();
 
   // 当前分数
@@ -68,12 +70,20 @@ class GridData {
       return;
     }
     gameState = 6;
+    var starLast = queryStarLast();
+    countLastStarAndScore(starLast.length);
     highestScore = max(score, highestScore);
     clearGrids();
     storeData();
-    breakStarList.clear();
+    var list = starLast.map((e) => e.toColorPoint()).toList();
+    for (var point in list) {
+      point.initValue(grid, _random);
+    }
+    BreakStarList lastBreakStar = createBreakStarList(list);
+    breakStarList.add(lastBreakStar);
     callback(() {});
     Future.delayed(const Duration(milliseconds: UX.exitSceneDuration), () {
+      breakStarList.clear(); // may error sometime
       if (gameState != 6) {
         return;
       }
@@ -92,7 +102,7 @@ class GridData {
     fillGrids();
     callback(() => gameState = 5);
     Future.delayed(const Duration(milliseconds: UX.enterSceneDuration), () {
-      endEnterAnim();
+      endEnterAnim(); // may error sometime
       if (gameState != 5) {
         return;
       }
@@ -117,13 +127,9 @@ class GridData {
     breakStarList.remove(list);
   }
 
-  void onLevelFinish() {
-    var starCount = queryStarLast();
-    if (starCount < 10) {
-      var scoreMore = 2000 - starCount * starCount * 20;
-      scoreLevel += scoreMore;
-      score += scoreMore;
-    }
+  void onLevelFinish(void Function(VoidCallback) callback) {
+    var starCount = queryStarLast().length;
+    countLastStarAndScore(starCount);
     if (score >= queryLevelGoal(level)) {
       gameState = 3;
     } else {
@@ -131,14 +137,22 @@ class GridData {
       highestScore = max(score, highestScore);
       storeData();
     }
+    callback(() {});
+  }
+
+  void countLastStarAndScore(int starCount) {
+    if (starCount < 10) {
+      var scoreMore = 2000 - starCount * starCount * 20;
+      scoreLevel += scoreMore;
+      score += scoreMore;
+    }
   }
 
   void fillGrids() {
-    var random = Random();
     for (int i = 0; i < UX.row; i++) {
       for (int j = 0; j < UX.col; j++) {
-        grids[i][j].setValue(random.nextInt(5) + 1);
-        double dy = i - grid * sqrt(random.nextDouble()) / 10;
+        grids[i][j].setValue(_random.nextInt(5) + 1);
+        double dy = i - grid * sqrt(_random.nextDouble()) / 10;
         // double dy = i.toDouble();
         var pos = Point<double>(j.toDouble(), dy);
         grids[i][j].updatePosition(pos, grid);
@@ -215,9 +229,8 @@ class GridData {
       return false;
     }
     // 创建消灭的星星的动画；标记需要移动的星星，并创建星星移动位置的动画
-    var random = Random();
     for (var point in sameColors) {
-      point.initValue(grid, random);
+      point.initValue(grid, _random);
     }
     _effectCreator.createEffect(
         starGrid.color, sameColors, brokeGrids(sameColors));
@@ -338,16 +351,16 @@ class GridData {
     return true;
   }
 
-  int queryStarLast() {
-    int count = 0;
+  List<StarGrid> queryStarLast() {
+    List<StarGrid> result = <StarGrid>[];
     for (int i = 0; i < UX.row; i++) {
       for (int j = 0; j < UX.col; j++) {
         if (grids[i][j].isNotEmpty()) {
-          count++;
+          result.add(grids[i][j]);
         }
       }
     }
-    return count;
+    return result;
   }
 
   List<List<StarGrid>> _createList() {
@@ -383,5 +396,5 @@ class NilEffectCreator implements EffectCreator {
   bool isEffectEnable() => false;
 
   @override
-  void createEffect((int, int) _, List<ColorPoint> _b, List<StarGrid> _m) {}
+  void createEffect((int, int) _, List<ColorPoint> p, List<StarGrid> g) {}
 }
