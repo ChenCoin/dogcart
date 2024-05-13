@@ -38,38 +38,7 @@ class _EffectBoardState extends State<EffectBoard>
   @override
   void initState() {
     super.initState();
-    debugPrint('offstage initState');
     widget.data.onViewInit(this);
-  }
-
-  @override
-  void didUpdateWidget(covariant EffectBoard oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    debugPrint('offstage didUpdateWidget');
-  }
-
-  @override
-  void reassemble() {
-    super.reassemble();
-    debugPrint('offstage reassemble');
-  }
-
-  @override
-  void activate() {
-    super.activate();
-    debugPrint('offstage activate');
-  }
-
-  @override
-  void deactivate() {
-    super.deactivate();
-    debugPrint('offstage reassemble');
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    debugPrint('offstage didChangeDependencies');
   }
 
   @override

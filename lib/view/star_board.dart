@@ -23,48 +23,6 @@ class StarBoard extends StatefulWidget {
 
 class _StarBoardState extends State<StarBoard> {
   @override
-  void didUpdateWidget(covariant StarBoard oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    debugPrint('Visibility didUpdateWidget');
-  }
-
-  @override
-  void reassemble() {
-    super.reassemble();
-    debugPrint('Visibility reassemble');
-  }
-
-  @override
-  void activate() {
-    super.activate();
-    debugPrint('Visibility activate');
-  }
-
-  @override
-  void deactivate() {
-    super.deactivate();
-    debugPrint('Visibility reassemble');
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    debugPrint('Visibility didChangeDependencies');
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    debugPrint('Visibility initState');
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    debugPrint('Visibility dispose');
-  }
-
-  @override
   Widget build(BuildContext context) {
     var size = widget.size;
     return GestureDetector(
@@ -136,7 +94,7 @@ class _MyPainter extends CustomPainter {
         left = left + grid / 2;
         top = top + grid / 2;
         drawStar(path, grid / 2 - 2, grid / 4, left, top, 0);
-        canvas.drawShadow(path, const Color(0xFF808080), 3, false);
+        canvas.drawShadow(path, const Color(0xFFA0A0A0), 2, false);
         starPaint.color = Color(color.$1);
         canvas.drawPath(path, starPaint);
       }

@@ -82,7 +82,7 @@ void drawMovingStar(
       left = left + grid / 2;
       top = top + grid / 2;
       drawStar(path, grid / 2 - 2, grid / 4, left, top, 0);
-      canvas.drawShadow(path, const Color(0xFF808080), 3, false);
+      canvas.drawShadow(path, const Color(0xFFA0A0A0), 2, false);
       canvas.drawPath(path, starPaint);
     }
   }
