@@ -18,10 +18,10 @@ class UX {
   static const breakStarDuration = 1200;
 
   // duration of enter level
-  static const enterSceneDuration = 1200;
+  static const enterSceneDuration = 800;
 
   // duration of exit level
-  static const exitSceneDuration = 2000;
+  static const exitSceneDuration = 1500;
 
   // dark mode when debug
   static const darkMode = false;

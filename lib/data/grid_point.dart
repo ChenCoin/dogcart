@@ -62,6 +62,12 @@ class StarGrid {
   // cache the top of static grids
   double top = 0;
 
+  // 0: normal animation
+  // 1: no animation
+  // 2: delay animation
+  // else normal animation
+  int animFlag = 0;
+
   StarGrid(this._location);
 
   void setValue(int value) {
@@ -123,14 +129,16 @@ class StarGrid {
     _movingState = false;
     anim = null;
     _position = _location;
+    animFlag = 0;
   }
 
   // refresh the position of star when level start
-  void updatePosition(Point<double> pos, double grid) {
+  void updatePosition(Point<double> pos, double grid, int animFlag) {
     _position = pos;
     _movingState = true;
     left = grid * _location.x + GridData.gap * (_location.x + 1);
     top = grid * _location.y + GridData.gap * (_location.y + 1);
+    this.animFlag = animFlag;
   }
 
   void resetPosition() {

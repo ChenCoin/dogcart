@@ -41,8 +41,8 @@ void drawSmoothRoundRect(Path path, double left, double top, double width,
   path.close();
 }
 
-void drawMovingStar(Canvas canvas, GridData data, Path path, Paint gridPaint,
-    Paint starPaint) {
+void drawMovingStar(
+    Canvas canvas, GridData data, Path path, Paint gridPaint, Paint starPaint) {
   int gap = GridData.gap;
   double grid = data.grid;
   // draw grids
@@ -53,6 +53,16 @@ void drawMovingStar(Canvas canvas, GridData data, Path path, Paint gridPaint,
         continue;
       }
       var anim = gridPoint.anim?.value ?? 0;
+      if (gridPoint.animFlag == 1) {
+        anim = 100;
+      }
+      if (gridPoint.animFlag == 2) {
+        if (anim < 50) {
+          continue;
+        }
+        anim = (anim - 50) * 2;
+      }
+
       var posY = gridPoint.getPosition().y;
       var i = posY + (dy - posY) * anim / 100;
       var posX = gridPoint.getPosition().x;
