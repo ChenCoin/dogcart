@@ -3,7 +3,7 @@ class UX {
   static const int col = 10;
 
   // row of star grids
-  static const int row = 11;
+  static const int row = 10;
 
   // the key to store highestScore
   static const String highestScoreKey = 'dogcart.highestScore';

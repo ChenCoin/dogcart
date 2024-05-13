@@ -148,7 +148,7 @@ class GridData {
         grids[i][j].setValue(_random.nextInt(5) + 1);
         double dy = i - grid * sqrt(_random.nextDouble()) / 10;
         var pos = Point<double>(j.toDouble(), dy);
-        grids[i][j].updatePosition(pos, grid, _random.nextInt(5));
+        grids[i][j].updatePosition(pos, grid, _random.nextInt(3));
       }
     }
   }
