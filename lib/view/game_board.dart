@@ -1,4 +1,3 @@
-import 'package:dogcart/view/scene_board.dart';
 import 'package:flutter/material.dart';
 import '../data/grid_data.dart';
 import 'effect_board.dart';
@@ -45,19 +44,13 @@ class _GameBoardState extends State<GameBoard> {
           ),
         ),
         RepaintBoundary(
-          child: Stack(
-            children: [
-              Offstage(
-                offstage: data.gameState != 1,
-                child: EffectBoard(
-                  size: size,
-                  data: data,
-                  callback: () => setState(() {}),
-                ),
-              ),
-              if (data.gameState == 5 || data.gameState == 6)
-                SceneBoard(size: size, data: data),
-            ],
+          child: Offstage(
+            offstage: data.gameState != 1,
+            child: EffectBoard(
+              size: size,
+              data: data,
+              callback: () => setState(() {}),
+            ),
           ),
         ),
       ],

@@ -36,17 +36,13 @@ class ColorPoint extends Point<int> {
 class BreakStarList {
   List<ColorPoint> list;
 
-  Animation<double>? anim;
+  Animation<double> anim;
 
   BreakStarList(this.list, this.anim);
 }
 
-BreakStarList createBreakStarList(List<ColorPoint> list) {
-  return BreakStarList(list, null);
-}
-
 class StarGrid {
-  // the position of star is a static value, it init at the object was new
+  // the position of star is a static value, it init when the object was new
   final Point<double> _location;
 
   // the position of star. when moving, it would from _position to _location

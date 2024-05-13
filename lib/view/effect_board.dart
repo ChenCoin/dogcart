@@ -27,10 +27,49 @@ class _EffectBoardState extends State<EffectBoard>
     implements EffectCreator {
   late _CachePair cachePair = _CachePair(() => _Cache(this, sync));
 
+  final durationEnter = const Duration(milliseconds: UX.enterSceneDuration);
+
+  final durationExit = const Duration(milliseconds: UX.exitSceneDuration);
+
+  final durationMoving = const Duration(milliseconds: UX.moveStarDuration);
+
+  final durationBreak = const Duration(milliseconds: UX.breakStarDuration);
+
   @override
   void initState() {
     super.initState();
+    debugPrint('offstage initState');
     widget.data.onViewInit(this);
+  }
+
+  @override
+  void didUpdateWidget(covariant EffectBoard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    debugPrint('offstage didUpdateWidget');
+  }
+
+  @override
+  void reassemble() {
+    super.reassemble();
+    debugPrint('offstage reassemble');
+  }
+
+  @override
+  void activate() {
+    super.activate();
+    debugPrint('offstage activate');
+  }
+
+  @override
+  void deactivate() {
+    super.deactivate();
+    debugPrint('offstage reassemble');
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    debugPrint('offstage didChangeDependencies');
   }
 
   @override
@@ -57,42 +96,84 @@ class _EffectBoardState extends State<EffectBoard>
   }
 
   @override
-  void createEffect(
-      (int, int) color, List<ColorPoint> breakList, List<StarGrid> movingList) {
-    var cache = cachePair.getAnimationCache();
-    cache.using = true;
-    var animCache = cache.getAnimationCache();
+  void createEffect(List<ColorPoint> breakList, List<StarGrid> movingList) {
     // break star animation
-    var breakStars = BreakStarList(breakList, animCache.ba);
+    var cacheBreak = cachePair.useAnimationCache();
+    var breakAnim = cacheBreak.getAnimationCache(durationBreak);
+    var breakStars = BreakStarList(breakList, breakAnim);
     widget.data.addBreakStarList(breakStars);
-    cache.addBreakListener((status) {
-      if (status == AnimationStatus.completed) {
-        if (UX.breakStarDuration >= UX.moveStarDuration) {
-          cache.endAnimation();
-        }
-        widget.data.removeBreakStarList(breakStars);
+    cacheBreak.addMovingListener((status) {
+      if (status != AnimationStatus.completed) {
+        return;
       }
+      cacheBreak.endAnimation();
+      widget.data.removeBreakStarList(breakStars);
     });
+
     // moving star animation
-    var movingAnim = animCache.ma;
+    var cacheMoving = cachePair.useAnimationCache();
+    var movingAnim = cacheMoving.getAnimationCache(durationMoving);
     for (var item in movingList) {
       item.willMove(movingAnim);
     }
-    cache.addMovingListener((status) {
-      if (status == AnimationStatus.completed) {
-        if (UX.breakStarDuration < UX.moveStarDuration) {
-          cache.endAnimation();
+    cacheMoving.addMovingListener((status) {
+      if (status != AnimationStatus.completed) {
+        return;
+      }
+      cacheMoving.endAnimation();
+      for (var item in movingList) {
+        if (item.anim == movingAnim) {
+          item.endMove();
         }
-        for (var item in movingList) {
+      }
+      widget.callback();
+    });
+
+    // start animation
+    cacheBreak.startAnimation();
+    cacheMoving.startAnimation();
+  }
+
+  @override
+  void enterScene() {
+    var cacheMoving = cachePair.useAnimationCache();
+    var movingAnim = cacheMoving.getAnimationCache(durationEnter);
+    for (var line in widget.data.grids) {
+      for (var item in line) {
+        item.willMove(movingAnim);
+      }
+    }
+    cacheMoving.addMovingListener((status) {
+      if (status != AnimationStatus.completed) {
+        return;
+      }
+      cacheMoving.endAnimation();
+      for (var line in widget.data.grids) {
+        for (var item in line) {
           if (item.anim == movingAnim) {
             item.endMove();
           }
         }
-        widget.callback();
       }
+      widget.callback();
     });
-    // start animation
-    cache.startAnimation();
+    cacheMoving.startAnimation();
+  }
+
+  @override
+  void exitScene(List<ColorPoint> breakList) {
+    var cacheBreak = cachePair.useAnimationCache();
+    var breakAnim = cacheBreak.getAnimationCache(durationExit);
+    var breakStars = BreakStarList(breakList, breakAnim);
+    widget.data.addBreakStarList(breakStars);
+    cacheBreak.addMovingListener((status) {
+      if (status != AnimationStatus.completed) {
+        return;
+      }
+      cacheBreak.endAnimation();
+      widget.data.removeBreakStarList(breakStars);
+    });
+    cacheBreak.startAnimation();
   }
 
   void sync() {
@@ -117,10 +198,8 @@ class _MyPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    getMovingAnim(StarGrid p) => p.anim?.value ?? 0;
-    drawMovingStar(canvas, data, path, gridPaint, starPaint, getMovingAnim);
-    getBreakAnim(BreakStarList p) => p.anim!;
-    drawBreakStar(canvas, data, path, starPaint, getBreakAnim);
+    drawMovingStar(canvas, data, path, gridPaint, starPaint);
+    drawBreakStar(canvas, data, path, starPaint);
   }
 
   @override
@@ -128,20 +207,14 @@ class _MyPainter extends CustomPainter {
 }
 
 class AnimationPair {
-  // animation controller of moving star
-  AnimationController mc;
+  AnimationController controller;
 
-  // animation value of moving star
-  Animation<double> ma;
+  Animation<double> anim;
 
-  // animation controller of break star
-  AnimationController bc;
-
-  // animation value of break star
-  Animation<double> ba;
-
-  AnimationPair(this.mc, this.ma, this.bc, this.ba);
+  AnimationPair(this.controller, this.anim);
 }
+
+final AnimationStatusListener _nilListener = (status) {};
 
 class _Cache {
   bool using = false;
@@ -152,56 +225,40 @@ class _Cache {
 
   AnimationPair? _cache;
 
-  AnimationStatusListener _mCacheListener = (status) {};
-
-  AnimationStatusListener _bCacheListener = (status) {};
+  AnimationStatusListener _mCacheListener = _nilListener;
 
   _Cache(this.ticker, this.callback);
 
-  AnimationPair getAnimationCache() {
+  Animation<double> getAnimationCache(Duration duration) {
     if (_cache == null) {
-      Duration duration = const Duration(milliseconds: UX.moveStarDuration);
       var controller = AnimationController(duration: duration, vsync: ticker);
       // animation was using for the dynamically value
       var curve =
           CurvedAnimation(parent: controller, curve: Curves.easeOutQuad);
       var anim = Tween(begin: 0.0, end: 100.0).animate(curve)
         ..addListener(callback);
-
-      Duration duration2 = const Duration(milliseconds: UX.breakStarDuration);
-      var controller2 = AnimationController(duration: duration2, vsync: ticker);
-      // animation was using for the dynamically value
-      var curve2 =
-          CurvedAnimation(parent: controller2, curve: Curves.easeOutQuad);
-      var anim2 = Tween(begin: 0.0, end: 100.0).animate(curve2)
-        ..addListener(callback);
-      _cache = AnimationPair(controller, anim, controller2, anim2);
+      _cache = AnimationPair(controller, anim);
+      return anim;
     } else {
-      _cache!.mc.reset();
-      _cache!.bc.reset();
+      _cache!.controller.reset();
+      _cache!.controller.duration = duration;
+      return _cache!.anim;
     }
-    return _cache!;
   }
 
   void addMovingListener(AnimationStatusListener listener) {
     _mCacheListener = listener;
-    _cache?.mc.addStatusListener(_mCacheListener);
-  }
-
-  void addBreakListener(AnimationStatusListener listener) {
-    _bCacheListener = listener;
-    _cache?.bc.addStatusListener(_bCacheListener);
+    _cache?.controller.addStatusListener(_mCacheListener);
   }
 
   void startAnimation() {
-    _cache?.mc.forward();
-    _cache?.bc.forward();
+    _cache?.controller.forward();
   }
 
   void endAnimation() {
     using = false;
-    _cache?.mc.removeStatusListener(_mCacheListener);
-    _cache?.bc.removeStatusListener(_bCacheListener);
+    _cache?.controller.removeStatusListener(_mCacheListener);
+    _mCacheListener = _nilListener;
   }
 }
 
@@ -225,9 +282,10 @@ class _CachePair {
 
   // isAnyEnable should be called before called this function.
   // The case of all anim using is not support
-  _Cache getAnimationCache() {
+  _Cache useAnimationCache() {
     for (var item in _list) {
       if (!item.using) {
+        item.using = true;
         return item;
       }
     }
@@ -237,8 +295,7 @@ class _CachePair {
 
   void dispose() {
     for (var item in _list) {
-      item._cache?.mc.dispose();
-      item._cache?.bc.dispose();
+      item._cache?.controller.dispose();
     }
   }
 }

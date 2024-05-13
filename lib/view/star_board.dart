@@ -23,6 +23,48 @@ class StarBoard extends StatefulWidget {
 
 class _StarBoardState extends State<StarBoard> {
   @override
+  void didUpdateWidget(covariant StarBoard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    debugPrint('Visibility didUpdateWidget');
+  }
+
+  @override
+  void reassemble() {
+    super.reassemble();
+    debugPrint('Visibility reassemble');
+  }
+
+  @override
+  void activate() {
+    super.activate();
+    debugPrint('Visibility activate');
+  }
+
+  @override
+  void deactivate() {
+    super.deactivate();
+    debugPrint('Visibility reassemble');
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    debugPrint('Visibility didChangeDependencies');
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    debugPrint('Visibility initState');
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    debugPrint('Visibility dispose');
+  }
+
+  @override
   Widget build(BuildContext context) {
     var size = widget.size;
     return GestureDetector(

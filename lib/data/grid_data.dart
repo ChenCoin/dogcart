@@ -40,11 +40,11 @@ class GridData {
   // 游戏状态
   // 0为初始进入游戏
   // 1为游戏中
-  // 2为游戏结束(不再使用)
+  // 2为游戏结束(deprecated)
   // 3为游戏中等待下一关
   // 4为游戏结算画面
-  // 5为每一关开局动画
-  // 6为每一关结束动画
+  // 5为每一关开局动画(deprecated)
+  // 6为每一关结束动画(deprecated)
   int gameState = 0;
 
   double grid = 0;
@@ -69,29 +69,8 @@ class GridData {
     if (gameState != 1 && gameState != 3) {
       return;
     }
-
-    gameState = 6;
-
-    var starLast = queryStarLast();
-    countLastStarAndScore(starLast.length);
-    var list = starLast.map((e) => e.toColorPoint()).toList();
-    for (var point in list) {
-      point.initValue(grid, _random, grids[point.y][point.x].color);
-    }
-    BreakStarList lastBreakStar = createBreakStarList(list);
-    breakStarList.add(lastBreakStar);
-
-    highestScore = max(score, highestScore);
-    clearGrids();
-    storeData();
-
-    callback(() {});
-    Future.delayed(const Duration(milliseconds: UX.exitSceneDuration), () {
-      breakStarList.clear(); // may error sometime
-      if (gameState != 6) {
-        return;
-      }
-      callback(() => gameState = 4);
+    onLevelEnd(callback, () {
+      gameState = 4;
     });
   }
 
@@ -104,14 +83,8 @@ class GridData {
     goal = queryLevelGoal(level);
     scoreLevel = 0;
     fillGrids();
-    callback(() => gameState = 5);
-    Future.delayed(const Duration(milliseconds: UX.enterSceneDuration), () {
-      endEnterAnim(); // may error sometime
-      if (gameState != 5) {
-        return;
-      }
-      callback(() => gameState = 1);
-    });
+    _effectCreator.enterScene();
+    callback(() => gameState = 1);
   }
 
   void onViewInit(EffectCreator effectCreator) {
@@ -132,29 +105,32 @@ class GridData {
   }
 
   void onLevelFinish(void Function(VoidCallback) callback) {
-    gameState = 6;
+    onLevelEnd(callback, () {
+      if (score >= queryLevelGoal(level)) {
+        gameState = 3;
+      } else {
+        gameState = 4;
+      }
+    });
+  }
+
+  void onLevelEnd(void Function(VoidCallback) callback, VoidCallback next) {
     var starLast = queryStarLast();
     countLastStarAndScore(starLast.length);
     var list = starLast.map((e) => e.toColorPoint()).toList();
     for (var point in list) {
       point.initValue(grid, _random, grids[point.y][point.x].color);
     }
-    BreakStarList lastBreakStar = createBreakStarList(list);
-    breakStarList.add(lastBreakStar);
+    _effectCreator.exitScene(list);
+
+    highestScore = max(score, highestScore);
+    storeData();
+
+    clearGrids();
     callback(() {});
     Future.delayed(const Duration(milliseconds: UX.exitSceneDuration), () {
       breakStarList.clear(); // may error sometime
-      if (gameState != 6) {
-        return;
-      }
-      if (score >= queryLevelGoal(level)) {
-        gameState = 3;
-      } else {
-        gameState = 4;
-        highestScore = max(score, highestScore);
-        storeData();
-      }
-      callback(() {});
+      callback(next);
     });
   }
 
@@ -171,7 +147,6 @@ class GridData {
       for (int j = 0; j < UX.col; j++) {
         grids[i][j].setValue(_random.nextInt(5) + 1);
         double dy = i - grid * sqrt(_random.nextDouble()) / 10;
-        // double dy = i.toDouble();
         var pos = Point<double>(j.toDouble(), dy);
         grids[i][j].updatePosition(pos, grid);
       }
@@ -235,24 +210,24 @@ class GridData {
     if (starGrid.isEmpty()) {
       return false;
     }
-    // 查找相连的同颜色的星星
+    // query the star with same color
     var sameColors = findSameColors(starGrid);
     debugPrint('onTap $dx $dy, num: ${sameColors.length}');
     if (sameColors.length < 2) {
       return false;
     }
-    // 动画不可用，点击无效
+    // the tap would cancel when the animation can not work
     if (!_effectCreator.isEffectEnable()) {
       debugPrint('tap cancel as animation running');
       return false;
     }
-    // 创建消灭的星星的动画；标记需要移动的星星，并创建星星移动位置的动画
+    // create the animation of break star.
+    // mark the star would moved, and create animation.
     for (var point in sameColors) {
       point.initValue(grid, _random, starGrid.color);
     }
-    _effectCreator.createEffect(
-        starGrid.color, sameColors, brokeGrids(sameColors));
-    // 结算分数
+    _effectCreator.createEffect(sameColors, brokeGrids(sameColors));
+    // count score
     var value = sameColors.length * sameColors.length * 5;
     scoreLevel += value;
     score += value;
@@ -404,8 +379,11 @@ class GridData {
 abstract class EffectCreator {
   bool isEffectEnable();
 
-  void createEffect(
-      (int, int) color, List<ColorPoint> breakList, List<StarGrid> movingList);
+  void createEffect(List<ColorPoint> breakList, List<StarGrid> movingList);
+
+  void enterScene();
+
+  void exitScene(List<ColorPoint> breakList);
 }
 
 class NilEffectCreator implements EffectCreator {
@@ -414,5 +392,11 @@ class NilEffectCreator implements EffectCreator {
   bool isEffectEnable() => false;
 
   @override
-  void createEffect((int, int) _, List<ColorPoint> p, List<StarGrid> g) {}
+  void createEffect(List<ColorPoint> p, List<StarGrid> g) {}
+
+  @override
+  void enterScene() {}
+
+  @override
+  void exitScene(List<ColorPoint> b) {}
 }

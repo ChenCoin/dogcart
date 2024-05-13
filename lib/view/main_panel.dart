@@ -141,9 +141,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   String _gameStateBtnLabel(BuildContext context) {
     if (data.gameState == 1 ||
-        data.gameState == 3 ||
-        data.gameState == 5 ||
-        data.gameState == 6) {
+        data.gameState == 3) {
       return '结束';
     }
     if (data.gameState == 4) {

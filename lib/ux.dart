@@ -9,7 +9,7 @@ class UX {
   static const String highestScoreKey = 'dogcart.highestScore';
 
   // the max animation of break star
-  static const animationCacheSize = 4;
+  static const animationCacheSize = 8;
 
   // duration of moving star
   static const moveStarDuration = 500;
