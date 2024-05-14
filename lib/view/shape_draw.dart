@@ -53,15 +53,11 @@ void drawMovingStar(
         continue;
       }
       var anim = gridPoint.anim?.value ?? 0;
-      if (gridPoint.animFlag == 1) {
-        anim = 100;
+      var animType = queryAnimWithFlag(gridPoint.animFlag, anim);
+      if (!animType.$1) {
+        continue;
       }
-      if (gridPoint.animFlag == 2) {
-        if (anim < 50) {
-          continue;
-        }
-        anim = (anim - 50) * 2;
-      }
+      anim = animType.$2;
 
       var posY = gridPoint.getPosition().y;
       var i = posY + (dy - posY) * anim / 100;
@@ -86,6 +82,19 @@ void drawMovingStar(
       canvas.drawPath(path, starPaint);
     }
   }
+}
+
+(bool, double) queryAnimWithFlag(int animFlag, double anim) {
+  if (animFlag == 1) {
+    return (true, 100);
+  }
+  if (animFlag == 2) {
+    if (anim < 50) {
+      return (false, 0);
+    }
+    return (true, (anim - 50) * 2);
+  }
+  return (true, anim);
 }
 
 void drawBreakStar(Canvas canvas, GridData data, Path path, Paint starPaint) {
