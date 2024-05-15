@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../data/grid_data.dart';
+import '../ux.dart';
 import 'count_down.dart';
 
 class LevelPanel extends StatefulWidget {
@@ -42,7 +43,7 @@ class _LevelPanelState extends State<LevelPanel> {
           BoxShadow(color: Colors.black12, offset: Offset(1, 1), blurRadius: 8)
         ],
       ),
-      padding: const EdgeInsets.only(top: 32),
+      padding: const EdgeInsets.only(top: 16),
       child: gameContent(),
     );
   }
@@ -61,6 +62,10 @@ class _LevelPanelState extends State<LevelPanel> {
   }
 
   Widget gameContinue() {
+    int breakStar = UX.row * UX.col - widget.data.lastStarCount;
+    int lastStarCount = widget.data.lastStarCount;
+    int lastStarScore = 2000 - lastStarCount * lastStarCount * 20;
+    int score = widget.data.scoreLevel - lastStarScore;
     return Column(
       children: [
         const Text(
@@ -72,7 +77,21 @@ class _LevelPanelState extends State<LevelPanel> {
         ),
         const Padding(padding: EdgeInsets.all(8)),
         Text(
-          '本局得分：${widget.data.scoreLevel}',
+          '本局得分: ${widget.data.scoreLevel}',
+          style: const TextStyle(
+            color: Colors.black54,
+            fontSize: 18,
+          ),
+        ),
+        Text(
+          '收集星星: $breakStar, 得分: $score',
+          style: const TextStyle(
+            color: Colors.black54,
+            fontSize: 18,
+          ),
+        ),
+        Text(
+          '剩余星星: $lastStarCount, 得分: $lastStarScore',
           style: const TextStyle(
             color: Colors.black54,
             fontSize: 18,
@@ -96,7 +115,7 @@ class _LevelPanelState extends State<LevelPanel> {
           ),
         ),
         const Padding(padding: EdgeInsets.all(4)),
-        const TimerText(secondCount: 5),
+        const TimerText(secondCount: levelSecond),
       ],
     );
   }
@@ -122,6 +141,44 @@ class _LevelPanelState extends State<LevelPanel> {
           style: const TextStyle(
             color: Colors.black54,
             fontSize: 18,
+          ),
+        ),
+        const Padding(padding: EdgeInsets.all(32)),
+        ElevatedButton(
+          onPressed: () {
+            widget.data.gameState = 0;
+            widget.callback();
+          },
+          style: ButtonStyle(
+              minimumSize: MaterialStateProperty.all(const Size(200, 48)),
+              shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(24))),
+              backgroundColor: MaterialStateProperty.all(Colors.amber)),
+          child: const Padding(
+            padding: EdgeInsets.only(left: 8, top: 2, right: 8, bottom: 6),
+            child: Text(
+              '回到首页',
+              style: TextStyle(
+                fontSize: 24,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ),
+        const Padding(padding: EdgeInsets.all(8)),
+        TextButton(
+          onPressed: () => widget.callback(),
+          style: ButtonStyle(
+              minimumSize: MaterialStateProperty.all(const Size(100, 32))),
+          child: const Padding(
+            padding: EdgeInsets.only(bottom: 2),
+            child: Text(
+              '重新开始',
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.amber,
+              ),
+            ),
           ),
         ),
       ],

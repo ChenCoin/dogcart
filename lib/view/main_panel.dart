@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../data/grid_data.dart';
@@ -36,10 +37,17 @@ class _MyHomePageState extends State<MyHomePage> {
       var duration = Duration(milliseconds: animDuration);
       Future.delayed(duration, _onLevelFinish);
     }
-    debugPrint('----- call redraw $isFinish');
   }
 
   void _onLevelNext() {
+    if (data.gameState == 4) {
+      data.start(setState);
+      return;
+    }
+    if (data.gameState == 0) {
+      setState(() {});
+      return;
+    }
     if (!data.isGameRunning()) {
       return;
     }
@@ -58,38 +66,102 @@ class _MyHomePageState extends State<MyHomePage> {
     // 宽度为屏幕宽度 - 40，特殊适配大屏
     final double width = min(screenSize.width - 12, 480);
     data.initGridSize(width);
-    return Align(
-      alignment: Alignment.topCenter,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: <Widget>[
-          SizedBox(
-            width: width - 12,
-            height: 72,
-            child: titleOnPanel(),
-          ),
-          const Padding(padding: EdgeInsets.all(4)),
-          Stack(
-            alignment: Alignment.center,
-            children: [
-              GameBoard(
-                data: data,
-                width: width,
-                callback: (isFinish) => setState(() {
-                  _onStateChange(isFinish);
-                }),
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        Align(
+          alignment: Alignment.topCenter,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              SizedBox(
+                width: width - 12,
+                height: 72,
+                child: titleOnPanel(),
               ),
-              if (data.isGameSettlement()) ...[
-                LevelPanel(
-                  data: data,
-                  callback: _onLevelNext,
-                ),
-              ]
+              const Padding(padding: EdgeInsets.all(4)),
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  GameBoard(
+                    data: data,
+                    width: width,
+                    callback: (isFinish) => setState(() {
+                      _onStateChange(isFinish);
+                    }),
+                  ),
+                  if (data.isGameSettlement()) ...[
+                    LevelPanel(
+                      data: data,
+                      callback: _onLevelNext,
+                    ),
+                  ]
+                ],
+              ),
+              if (data.gameState == 1 || data.gameState == 3) btnOnBottom(),
             ],
           ),
-          btnOnBottom(),
-        ],
-      ),
+        ),
+        if (data.gameState != 1 && data.gameState != 3 && data.gameState != 4)
+          homePage(),
+      ],
+    );
+  }
+
+  Widget homePage() {
+    String title = '收集星星星';
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        const Padding(padding: EdgeInsets.all(48)),
+        Stack(
+          alignment: Alignment.topCenter,
+          children: [
+            Text(
+              title,
+              style: TextStyle(
+                  fontSize: 54,
+                  fontWeight: FontWeight.bold,
+                  foreground: Paint()
+                    ..style = PaintingStyle.stroke
+                    ..strokeWidth = 10
+                    ..color = Colors.amber),
+            ),
+            Text(
+              title,
+              style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 54,
+                  fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+        const Padding(padding: EdgeInsets.all(96)),
+        ElevatedButton(
+          onPressed: () => _onBtnTap(),
+          style: ButtonStyle(
+              shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(24))),
+              backgroundColor: MaterialStateProperty.all(Colors.amber)),
+          child: const Padding(
+            padding: EdgeInsets.only(left: 16, top: 6, right: 16, bottom: 8),
+            child: Text(
+              '开始游戏',
+              style: TextStyle(
+                fontSize: 24,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(16),
+          child: Text(
+            '最高分: ${data.highestScore}',
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+        ),
+      ],
     );
   }
 
@@ -123,25 +195,17 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
         ] else ...[
-          Align(
+          const Align(
             alignment: Alignment.bottomCenter,
-            child: Text(highestScoreTip()),
+            child: Text('消除连在一起的相同颜色的星星。'),
           ),
         ],
       ],
     );
   }
 
-  String highestScoreTip() {
-    if (data.highestScore == 0) {
-      return '消除连在一起的相同颜色的星星。';
-    }
-    return '消除相同颜色的星星。最高分：${data.highestScore}';
-  }
-
   String _gameStateBtnLabel(BuildContext context) {
-    if (data.gameState == 1 ||
-        data.gameState == 3) {
+    if (data.gameState == 1 || data.gameState == 3) {
       return '结束';
     }
     if (data.gameState == 4) {

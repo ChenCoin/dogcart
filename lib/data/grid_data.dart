@@ -22,6 +22,9 @@ class GridData {
   // 本局得分
   int scoreLevel = 0;
 
+  // 剩余星星
+  int lastStarCount = 0;
+
   // 第几关
   int level = 0;
 
@@ -82,6 +85,7 @@ class GridData {
   void onLevelStart(void Function(VoidCallback) callback) {
     goal = queryLevelGoal(level);
     scoreLevel = 0;
+    lastStarCount = 0;
     fillGrids();
     _effectCreator.enterScene();
     callback(() => gameState = 1);
@@ -135,6 +139,7 @@ class GridData {
   }
 
   void countLastStarAndScore(int starCount) {
+    lastStarCount = starCount;
     if (starCount < 10) {
       var scoreMore = 2000 - starCount * starCount * 20;
       scoreLevel += scoreMore;
