@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'content.dart';
 import 'ux.dart';
 import 'view/main_panel.dart';
 import 'view/meteor_board.dart';
@@ -15,7 +16,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      onGenerateTitle: (ctx) => '收集星星星',
+      onGenerateTitle: (ctx) => Content.title,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFFAFAF8)),
         primaryColor: const Color(0xFFFAFAF8),

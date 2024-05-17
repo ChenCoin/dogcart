@@ -1,6 +1,6 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
+import '../content.dart';
 
 class TimerText extends StatefulWidget {
   final int secondCount;
@@ -25,7 +25,7 @@ class _TimerTextState extends State<TimerText> {
 
   @override
   Widget build(BuildContext context) {
-    return Text('$secondCount 秒后进入下一关');
+    return Text(Content.nextLevel(secondCount));
   }
 
   @override

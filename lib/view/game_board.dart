@@ -34,7 +34,7 @@ class _GameBoardState extends State<GameBoard> {
           height: height,
         ),
         Visibility(
-          visible: data.gameState == 1,
+          visible: data.gameState.isPlaying(),
           child: RepaintBoundary(
             child: StarBoard(
               size: size,
@@ -45,7 +45,7 @@ class _GameBoardState extends State<GameBoard> {
         ),
         RepaintBoundary(
           child: Offstage(
-            offstage: data.gameState != 1,
+            offstage: !data.gameState.isPlaying(),
             child: EffectBoard(
               size: size,
               data: data,

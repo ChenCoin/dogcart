@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../ux.dart';
+import 'game_state.dart';
 import 'grid_point.dart';
 
 class GridData {
@@ -40,15 +41,7 @@ class GridData {
   // 临时调试，后续关卡为, 20500, 24000
   var goals = <int>[1000, 2500, 4000, 5500, 7500, 9000, 11000, 13500, 16500];
 
-  // 游戏状态
-  // 0为初始进入游戏
-  // 1为游戏中
-  // 2为游戏结束(deprecated)
-  // 3为游戏中等待下一关
-  // 4为游戏结算画面
-  // 5为每一关开局动画(deprecated)
-  // 6为每一关结束动画(deprecated)
-  int gameState = 0;
+  GameState gameState = GameState();
 
   double grid = 0;
 
@@ -69,12 +62,10 @@ class GridData {
   }
 
   void end(void Function(VoidCallback) callback) async {
-    if (gameState != 1 && gameState != 3) {
+    if (!gameState.isRunning()) {
       return;
     }
-    onLevelEnd(callback, () {
-      gameState = 4;
-    });
+    onLevelEnd(callback, gameState.onGameOver);
   }
 
   void nextLevel(void Function(VoidCallback) callback) {
@@ -88,7 +79,7 @@ class GridData {
     lastStarCount = 0;
     fillGrids();
     _effectCreator.enterScene();
-    callback(() => gameState = 1);
+    callback(gameState.onPlay);
   }
 
   void onViewInit(EffectCreator effectCreator) {
@@ -110,11 +101,7 @@ class GridData {
 
   void onLevelFinish(void Function(VoidCallback) callback) {
     onLevelEnd(callback, () {
-      if (score >= queryLevelGoal(level)) {
-        gameState = 3;
-      } else {
-        gameState = 4;
-      }
+      gameState.onLevelNext(score >= queryLevelGoal(level));
     });
   }
 
@@ -187,15 +174,15 @@ class GridData {
   }
 
   bool isGameRunning() {
-    return gameState == 1 || gameState == 3;
+    return gameState.isRunning();
   }
 
   bool isGameSettlement() {
-    return gameState == 3 || gameState == 4;
+    return gameState.isGameSettlement();
   }
 
   bool isGameWillNextLevel() {
-    return gameState == 3;
+    return gameState.isLevelUp();
   }
 
   // this function would called before game start

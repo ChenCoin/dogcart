@@ -146,7 +146,7 @@ class _LevelPanelState extends State<LevelPanel> {
         const Padding(padding: EdgeInsets.all(32)),
         ElevatedButton(
           onPressed: () {
-            widget.data.gameState = 0;
+            widget.data.gameState.backHome();
             widget.callback();
           },
           style: ButtonStyle(

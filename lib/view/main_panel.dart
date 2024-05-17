@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../data/grid_data.dart';
@@ -20,7 +19,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final GridData data = GridData();
 
   void _onBtnTap() {
-    if (data.gameState == 0 || data.gameState == 4) {
+    if (!data.gameState.isRunning()) {
       data.start(setState);
       return;
     }
@@ -40,11 +39,11 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _onLevelNext() {
-    if (data.gameState == 4) {
+    if (data.gameState.isGameOver()) {
       data.start(setState);
       return;
     }
-    if (data.gameState == 0) {
+    if (data.gameState.isHome()) {
       setState(() {});
       return;
     }
@@ -98,12 +97,11 @@ class _MyHomePageState extends State<MyHomePage> {
                   ]
                 ],
               ),
-              if (data.gameState == 1 || data.gameState == 3) btnOnBottom(),
+              if (data.gameState.isRunning()) btnOnBottom(),
             ],
           ),
         ),
-        if (data.gameState != 1 && data.gameState != 3 && data.gameState != 4)
-          homePage(),
+        if (data.gameState.isHome()) homePage(),
       ],
     );
   }
@@ -205,10 +203,10 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   String _gameStateBtnLabel(BuildContext context) {
-    if (data.gameState == 1 || data.gameState == 3) {
+    if (data.gameState.isRunning()) {
       return '结束';
     }
-    if (data.gameState == 4) {
+    if (data.gameState.isGameSettlement()) {
       return '再次挑战';
     }
     return '开始游戏';

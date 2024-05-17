@@ -11,7 +11,7 @@
 ### 命令行备忘
 
 1. 命令行编译Web：  
-   C:\flutter\bin\flutter build web --web-renderer canvaskit --release --base-href=/dogcart/
+   C:\flutter\bin\flutter build web --web-renderer canvaskit --release --base-href=/dogcart/ --no-web-resources-cdn --no-tree-shake-icons
 
 2. 修改hosts文件  
    windows上hosts文件路径为
