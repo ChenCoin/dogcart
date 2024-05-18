@@ -1,5 +1,5 @@
 class Content {
-  static const title = '收集星星星';
+  static const title = '星星王国';
 
   static const startGame = '开始游戏';
 

@@ -119,18 +119,18 @@ class _MyHomePageState extends State<MyHomePage> {
             Text(
               title,
               style: TextStyle(
-                  fontSize: 54,
+                  fontSize: 64,
                   fontWeight: FontWeight.bold,
                   foreground: Paint()
                     ..style = PaintingStyle.stroke
-                    ..strokeWidth = 10
+                    ..strokeWidth = 15
                     ..color = Colors.amber),
             ),
             Text(
               title,
               style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 54,
+                  fontSize: 64,
                   fontWeight: FontWeight.bold),
             ),
           ],
@@ -157,7 +157,7 @@ class _MyHomePageState extends State<MyHomePage> {
           padding: const EdgeInsets.all(16),
           child: Text(
             '最高分: ${data.highestScore}',
-            style: Theme.of(context).textTheme.bodyMedium,
+            style: const TextStyle(color: Colors.white),
           ),
         ),
       ],
@@ -196,7 +196,10 @@ class _MyHomePageState extends State<MyHomePage> {
         ] else ...[
           const Align(
             alignment: Alignment.bottomCenter,
-            child: Text('消除连在一起的相同颜色的星星。'),
+            child: Text(
+              '消除连在一起的相同颜色的星星。',
+              style: const TextStyle(color: Colors.white),
+            ),
           ),
         ],
       ],
