@@ -66,6 +66,11 @@ class _MyPainter extends CustomPainter {
     ..color = const Color(0xFFEAEAE8)
     ..strokeWidth = 1.0;
 
+  final fillPaint = Paint()
+    ..isAntiAlias = true
+    ..style = PaintingStyle.fill
+    ..color = const Color(0xFFFAFAF8);
+
   _MyPainter({required this.data});
 
   @override
@@ -105,6 +110,7 @@ class _MyPainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 
   void drawBackground(Canvas canvas, Rect rect, double grid) {
+    canvas.drawRect(rect, fillPaint);
     // draw row line
     int floor = (GridData.gap / 2).floor();
     for (int i = 0; i <= UX.row; i++) {

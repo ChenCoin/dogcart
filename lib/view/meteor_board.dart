@@ -18,8 +18,8 @@ class _MeteorState extends State<MeteorBoard> with TickerProviderStateMixin {
   // 每5秒执行一次流星尝试
   static const int _meteorDuration = 5;
 
-  // 1/3的概率显示流星
-  static const int _probability = 3;
+  // 1/2的概率显示流星
+  static const int _probability = 2;
 
   // 流星动画的时长为3秒
   static const int _animationDuration = 3;

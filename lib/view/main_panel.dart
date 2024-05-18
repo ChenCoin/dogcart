@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import '../content.dart';
 import '../data/grid_data.dart';
 import '../ux.dart';
 import 'game_board.dart';
@@ -107,7 +108,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget homePage() {
-    String title = '收集星星星';
+    String title = Content.title;
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
@@ -144,7 +145,7 @@ class _MyHomePageState extends State<MyHomePage> {
           child: const Padding(
             padding: EdgeInsets.only(left: 16, top: 6, right: 16, bottom: 8),
             child: Text(
-              '开始游戏',
+              Content.startGame,
               style: TextStyle(
                 fontSize: 24,
                 color: Colors.white,

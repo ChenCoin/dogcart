@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'content.dart';
 import 'ux.dart';
+import 'view/background.dart';
 import 'view/main_panel.dart';
 import 'view/meteor_board.dart';
 import 'web/conf_nil.dart' if (dart.library.html) 'web/conf_web.dart';
@@ -26,8 +27,8 @@ class MyApp extends StatelessWidget {
         backgroundColor: const Color(0xFFFAFAF8),
         body: Stack(
           children: [
-            const MyHomePage(),
             IgnorePointer(child: home(context)),
+            const MyHomePage(),
           ],
         ),
       ),
@@ -35,11 +36,13 @@ class MyApp extends StatelessWidget {
   }
 
   Widget home(BuildContext context) {
+    final size = MediaQuery.of(context).size;
     return Stack(
       children: [
+        BackgroundBoard(size: size),
+        MeteorBoard(size: size),
         if (UX.darkMode)
           Container(decoration: const BoxDecoration(color: Color(0xD0000000))),
-        MeteorBoard(size: MediaQuery.of(context).size),
       ],
     );
   }
