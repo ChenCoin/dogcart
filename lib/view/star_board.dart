@@ -110,17 +110,20 @@ class _MyPainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 
   void drawBackground(Canvas canvas, Rect rect, double grid) {
-    canvas.drawRect(rect, fillPaint);
+    // draw white background
+    drawSmoothRoundRect(path, 0, 0, rect.width, rect.height, 12);
+    canvas.drawPath(path, fillPaint);
+
     // draw row line
     int floor = (GridData.gap / 2).floor();
-    for (int i = 0; i <= UX.row; i++) {
+    for (int i = 1; i < UX.row; i++) {
       double dy = rect.top + (grid + GridData.gap) * i + floor;
       canvas.drawLine(Offset(rect.left + floor, dy),
           Offset(rect.right - floor * 2 + 2, dy), bgrPaint);
     }
 
     // draw col line
-    for (int i = 0; i <= UX.col; i++) {
+    for (int i = 1; i < UX.col; i++) {
       double dx = rect.left + (grid + GridData.gap) * i + floor;
       canvas.drawLine(Offset(dx, rect.top + floor),
           Offset(dx, rect.bottom - floor * 2 + 2), bgrPaint);
