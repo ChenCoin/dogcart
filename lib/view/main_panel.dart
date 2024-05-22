@@ -119,19 +119,22 @@ class _MyHomePageState extends State<MyHomePage> {
             Text(
               title,
               style: TextStyle(
-                  fontSize: 64,
+                  fontSize: 84,
                   fontWeight: FontWeight.bold,
+                  fontFamily: 'pig',
                   foreground: Paint()
                     ..style = PaintingStyle.stroke
-                    ..strokeWidth = 15
+                    ..strokeWidth = 12
                     ..color = Colors.amber),
             ),
             Text(
               title,
               style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 64,
-                  fontWeight: FontWeight.bold),
+                color: Colors.white,
+                fontSize: 84,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'pig',
+              ),
             ),
           ],
         ),
@@ -139,9 +142,9 @@ class _MyHomePageState extends State<MyHomePage> {
         ElevatedButton(
           onPressed: () => _onBtnTap(),
           style: ButtonStyle(
-              shape: MaterialStateProperty.all(RoundedRectangleBorder(
+              shape: WidgetStateProperty.all(RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(24))),
-              backgroundColor: MaterialStateProperty.all(Colors.amber)),
+              backgroundColor: WidgetStateProperty.all(Colors.amber)),
           child: const Padding(
             padding: EdgeInsets.only(left: 16, top: 6, right: 16, bottom: 8),
             child: Text(
@@ -174,7 +177,7 @@ class _MyHomePageState extends State<MyHomePage> {
               children: [
                 const TextSpan(
                   text: "分数: ",
-                  style: TextStyle(color: Colors.black87, fontSize: 18),
+                  style: TextStyle(color: Colors.white, fontSize: 18),
                 ),
                 TextSpan(
                   text: "${data.score}",
@@ -189,7 +192,7 @@ class _MyHomePageState extends State<MyHomePage> {
               '关卡: ${data.level + 1}  目标: ${data.goal}',
               style: const TextStyle(
                 fontSize: 18,
-                color: Colors.black87,
+                color: Colors.white,
               ),
             ),
           ),
