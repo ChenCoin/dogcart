@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../content.dart';
 import '../data/grid_data.dart';
 import '../ux.dart';
 import 'count_down.dart';
@@ -69,7 +70,7 @@ class _LevelPanelState extends State<LevelPanel> {
     return Column(
       children: [
         const Text(
-          '通关',
+          Content.pass,
           style: TextStyle(
             fontSize: 32,
             fontWeight: FontWeight.bold,
@@ -77,21 +78,21 @@ class _LevelPanelState extends State<LevelPanel> {
         ),
         const Padding(padding: EdgeInsets.all(8)),
         Text(
-          '本局得分: ${widget.data.scoreLevel}',
+          Content.level_score(widget.data.scoreLevel),
           style: const TextStyle(
             color: Colors.black54,
             fontSize: 18,
           ),
         ),
         Text(
-          '收集星星: $breakStar, 得分: $score',
+          Content.collect_star(breakStar, score),
           style: const TextStyle(
             color: Colors.black54,
             fontSize: 18,
           ),
         ),
         Text(
-          '剩余星星: $lastStarCount, 得分: $lastStarScore',
+          Content.last_star(lastStarCount, lastStarScore),
           style: const TextStyle(
             color: Colors.black54,
             fontSize: 18,
@@ -99,7 +100,7 @@ class _LevelPanelState extends State<LevelPanel> {
         ),
         const Padding(padding: EdgeInsets.all(16)),
         const Text(
-          '下一关',
+          Content.next_level,
           style: TextStyle(
             color: Colors.black54,
             fontSize: 24,
@@ -108,7 +109,7 @@ class _LevelPanelState extends State<LevelPanel> {
         ),
         const Padding(padding: EdgeInsets.all(8)),
         Text(
-          '目标 ${widget.data.queryGoalNextLevel()}',
+          Content.target(widget.data.queryGoalNextLevel()),
           style: const TextStyle(
             color: Colors.orangeAccent,
             fontSize: 18,

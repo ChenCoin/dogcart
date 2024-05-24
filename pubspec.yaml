@@ -90,7 +90,7 @@ flutter:
       fonts:
         - asset: fonts/pig.otf
           style: normal
-    - family: bubble
+    - family: harmony
       fonts:
-        - asset: fonts/bubble.ttf
+        - asset: fonts/HarmonyOS_Sans_SC_Regular.ttf
           style: normal

@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFFAFAF8)),
         primaryColor: const Color(0xFFFAFAF8),
         useMaterial3: true,
-        fontFamily: 'bubble'
+        fontFamily: 'harmony'
       ),
       home: Scaffold(
         backgroundColor: const Color(0xFFFAFAF8),
