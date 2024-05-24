@@ -78,21 +78,21 @@ class _LevelPanelState extends State<LevelPanel> {
         ),
         const Padding(padding: EdgeInsets.all(8)),
         Text(
-          Content.level_score(widget.data.scoreLevel),
+          Content.levelScore(widget.data.scoreLevel),
           style: const TextStyle(
             color: Colors.black54,
             fontSize: 18,
           ),
         ),
         Text(
-          Content.collect_star(breakStar, score),
+          Content.collectStar(breakStar, score),
           style: const TextStyle(
             color: Colors.black54,
             fontSize: 18,
           ),
         ),
         Text(
-          Content.last_star(lastStarCount, lastStarScore),
+          Content.lastStar(lastStarCount, lastStarScore),
           style: const TextStyle(
             color: Colors.black54,
             fontSize: 18,
@@ -100,7 +100,7 @@ class _LevelPanelState extends State<LevelPanel> {
         ),
         const Padding(padding: EdgeInsets.all(16)),
         const Text(
-          Content.next_level,
+          Content.nextLevel,
           style: TextStyle(
             color: Colors.black54,
             fontSize: 24,
@@ -151,10 +151,10 @@ class _LevelPanelState extends State<LevelPanel> {
             widget.callback();
           },
           style: ButtonStyle(
-              minimumSize: MaterialStateProperty.all(const Size(200, 48)),
-              shape: MaterialStateProperty.all(RoundedRectangleBorder(
+              minimumSize: WidgetStateProperty.all(const Size(200, 48)),
+              shape: WidgetStateProperty.all(RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(24))),
-              backgroundColor: MaterialStateProperty.all(Colors.amber)),
+              backgroundColor: WidgetStateProperty.all(Colors.amber)),
           child: const Padding(
             padding: EdgeInsets.only(left: 8, top: 2, right: 8, bottom: 6),
             child: Text(
@@ -170,7 +170,7 @@ class _LevelPanelState extends State<LevelPanel> {
         TextButton(
           onPressed: () => widget.callback(),
           style: ButtonStyle(
-              minimumSize: MaterialStateProperty.all(const Size(100, 32))),
+              minimumSize: WidgetStateProperty.all(const Size(100, 32))),
           child: const Padding(
             padding: EdgeInsets.only(bottom: 2),
             child: Text(

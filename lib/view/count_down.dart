@@ -25,7 +25,7 @@ class _TimerTextState extends State<TimerText> {
 
   @override
   Widget build(BuildContext context) {
-    return Text(Content.nextLevel(secondCount));
+    return Text(Content.goToNextLevel(secondCount));
   }
 
   @override

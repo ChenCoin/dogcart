@@ -183,7 +183,7 @@ class AnimationPair {
   AnimationPair(this.controller, this.anim);
 }
 
-final AnimationStatusListener _nilListener = (status) {};
+final _nilListener = (status) {};
 
 class _Cache {
   bool using = false;
