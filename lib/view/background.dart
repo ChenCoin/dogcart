@@ -17,14 +17,11 @@ class _BackgroundState extends State<BackgroundBoard> {
   @override
   void initState() {
     super.initState();
-    double w = widget.size.width;
-    double h = widget.size.height;
-
     final random = Random();
     int starCount = 10 + random.nextInt(6);
     for (int i = 0; i < starCount; i++) {
       double r = (2 + random.nextInt(4)).toDouble();
-      starList.add((random.nextDouble() * w, random.nextDouble() * h, r));
+      starList.add((random.nextDouble(), random.nextDouble(), r));
     }
   }
 
@@ -77,8 +74,10 @@ class _MyPainter extends CustomPainter {
     moonPaint.shader = moonGradient.createShader(rect);
     canvas.drawCircle(offset, r, moonPaint);
 
+    double w = size.width;
+    double h = size.height;
     for (final star in starList) {
-      canvas.drawCircle(Offset(star.$1, star.$2), star.$3, starPaint);
+      canvas.drawCircle(Offset(star.$1 * w, star.$2 * h), star.$3, starPaint);
     }
   }
 
