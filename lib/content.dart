@@ -1,6 +1,8 @@
 class Content {
   static const title = '星星王国';
 
+  static const version = 'v1.5.0';
+
   static const startGame = '开始游戏';
 
   static goToNextLevel(int second) => '$second 秒后进入下一关';

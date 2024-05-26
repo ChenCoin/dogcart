@@ -19,11 +19,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       onGenerateTitle: (ctx) => Content.title,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFFAFAF8)),
-        primaryColor: const Color(0xFFFAFAF8),
-        useMaterial3: true,
-        fontFamily: 'harmony'
-      ),
+          colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFFAFAF8)),
+          primaryColor: const Color(0xFFFAFAF8),
+          useMaterial3: true,
+          fontFamily: 'harmony'),
       home: Scaffold(
         backgroundColor: const Color(0xFFFAFAF8),
         body: Stack(
@@ -38,10 +37,18 @@ class MyApp extends StatelessWidget {
 
   Widget home(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    const version = Content.version;
     return Stack(
       children: [
         BackgroundBoard(size: size),
         MeteorBoard(size: size),
+        const Align(
+          alignment: Alignment.bottomRight,
+          child: Padding(
+            padding: EdgeInsets.all(5),
+            child: Text(version, style: TextStyle(color: Colors.white70)),
+          ),
+        ),
         if (UX.darkMode)
           Container(decoration: const BoxDecoration(color: Color(0xD0000000))),
       ],
