@@ -12,14 +12,8 @@
 
 ### 命令行备忘
 
-1. 命令行编译Web：  
-   flutter build web --web-renderer canvaskit --release --base-href=/dogcart/
-     --web-renderer html
-     --no-web-resources-cdn --no-tree-shake-icons --pwa-strategy none
-   flutter build web --web-renderer html --release --base-href=/dogcart/
-   flutter build web --web-renderer skwasm --release --base-href=/dogcart/
-     --no-web-resources-cdn --no-tree-shake-icons --no-source-maps --csp --optimization-level=4
-   flutter build web --release --base-href=/dogcart/ --no-web-resources-cdn --no-tree-shake-icons --no-source-maps --csp --optimization-level=4 --wasm
+1. 命令行编译Web：
+   flutter build web --release --base-href=/dogcart/ --no-web-resources-cdn --optimization-level=4 --wasm
 
 2. 修改hosts文件  
    windows上hosts文件路径为
