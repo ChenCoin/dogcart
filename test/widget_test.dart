@@ -11,10 +11,28 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   debugPrint('test start');
-  var textContent = '';
+  var textContent = '0123456789';
+  textContent += 'qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM';
   textContent += Content.startGame;
-  debugPrint(textContent);
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-
-  });
+  textContent += Content.goToNextLevel(0);
+  textContent += Content.pass;
+  textContent += Content.levelScore(0);
+  textContent += Content.collectStar(0, 0);
+  textContent += Content.lastStar(0, 0);
+  textContent += Content.nextLevel;
+  textContent += Content.target(0);
+  textContent += Content.gameOver;
+  textContent += Content.gameScore(0);
+  textContent += Content.highestScore(0);
+  textContent += Content.backHome;
+  textContent += Content.restart;
+  textContent += Content.theHighestScore(0);
+  textContent += Content.score;
+  textContent += Content.levelAndGoal(0, 0);
+  textContent += Content.gameTip;
+  textContent += Content.endGame;
+  textContent += Content.playAgain;
+  debugPrint(textContent.characters.toSet().reduce((a, b) => a + b));
+  debugPrint('test end');
+  testWidgets('Counter increments smoke test', (WidgetTester tester) async {});
 }

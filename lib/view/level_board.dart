@@ -125,12 +125,12 @@ class _LevelPanelState extends State<LevelPanel> {
     return Column(
       children: [
         const Text(
-          '游戏结束',
+          Content.gameOver,
           style: TextStyle(fontSize: 32),
         ),
         const Padding(padding: EdgeInsets.all(8)),
         Text(
-          '本轮游戏得分：${widget.data.score}',
+          Content.gameScore(widget.data.score),
           style: const TextStyle(
             color: Colors.black54,
             fontSize: 18,
@@ -138,7 +138,7 @@ class _LevelPanelState extends State<LevelPanel> {
         ),
         const Padding(padding: EdgeInsets.all(4)),
         Text(
-          '最高得分：${widget.data.highestScore}',
+          Content.highestScore(widget.data.highestScore),
           style: const TextStyle(
             color: Colors.black54,
             fontSize: 18,
@@ -151,18 +151,15 @@ class _LevelPanelState extends State<LevelPanel> {
             widget.callback();
           },
           style: ButtonStyle(
-              minimumSize: WidgetStateProperty.all(const Size(200, 48)),
+              minimumSize: WidgetStateProperty.all(const Size(180, 54)),
               shape: WidgetStateProperty.all(RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(24))),
               backgroundColor: WidgetStateProperty.all(Colors.amber)),
-          child: const Padding(
-            padding: EdgeInsets.only(left: 8, top: 2, right: 8, bottom: 6),
-            child: Text(
-              '回到首页',
-              style: TextStyle(
-                fontSize: 24,
-                color: Colors.white,
-              ),
+          child: const Text(
+            Content.backHome,
+            style: TextStyle(
+              fontSize: 24,
+              color: Colors.white,
             ),
           ),
         ),
@@ -172,9 +169,9 @@ class _LevelPanelState extends State<LevelPanel> {
           style: ButtonStyle(
               minimumSize: WidgetStateProperty.all(const Size(100, 32))),
           child: const Padding(
-            padding: EdgeInsets.only(bottom: 2),
+            padding: EdgeInsets.all(2),
             child: Text(
-              '重新开始',
+              Content.restart,
               style: TextStyle(
                 fontSize: 12,
                 color: Colors.amber,

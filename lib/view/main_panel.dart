@@ -142,24 +142,22 @@ class _MyHomePageState extends State<MyHomePage> {
         ElevatedButton(
           onPressed: () => _onBtnTap(),
           style: ButtonStyle(
+              minimumSize: WidgetStateProperty.all(const Size(180, 54)),
               shape: WidgetStateProperty.all(RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(24))),
               backgroundColor: WidgetStateProperty.all(Colors.amber)),
-          child: const Padding(
-            padding: EdgeInsets.only(left: 16, top: 6, right: 16, bottom: 8),
-            child: Text(
-              Content.startGame,
-              style: TextStyle(
-                fontSize: 24,
-                color: Colors.white,
-              ),
+          child: const Text(
+            Content.startGame,
+            style: TextStyle(
+              fontSize: 24,
+              color: Colors.white,
             ),
           ),
         ),
         Padding(
           padding: const EdgeInsets.all(16),
           child: Text(
-            '最高分: ${data.highestScore}',
+            Content.theHighestScore(data.highestScore),
             style: const TextStyle(color: Colors.white),
           ),
         ),
@@ -176,7 +174,7 @@ class _MyHomePageState extends State<MyHomePage> {
             child: Text.rich(TextSpan(
               children: [
                 const TextSpan(
-                  text: "分数: ",
+                  text: Content.score,
                   style: TextStyle(color: Colors.white, fontSize: 18),
                 ),
                 TextSpan(
@@ -189,7 +187,7 @@ class _MyHomePageState extends State<MyHomePage> {
           Align(
             alignment: Alignment.bottomRight,
             child: Text(
-              '关卡: ${data.level + 1}  目标: ${data.goal}',
+              Content.levelAndGoal(data.level + 1, data.goal),
               style: const TextStyle(
                 fontSize: 18,
                 color: Colors.white,
@@ -200,7 +198,7 @@ class _MyHomePageState extends State<MyHomePage> {
           const Align(
             alignment: Alignment.bottomCenter,
             child: Text(
-              '消除连在一起的相同颜色的星星。',
+              Content.gameTip,
               style: TextStyle(color: Colors.white),
             ),
           ),
@@ -211,12 +209,12 @@ class _MyHomePageState extends State<MyHomePage> {
 
   String _gameStateBtnLabel(BuildContext context) {
     if (data.gameState.isRunning()) {
-      return '结束';
+      return Content.endGame;
     }
     if (data.gameState.isGameSettlement()) {
-      return '再次挑战';
+      return Content.playAgain;
     }
-    return '开始游戏';
+    return Content.startGame;
   }
 
   Widget btnOnBottom() {
