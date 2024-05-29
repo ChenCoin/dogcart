@@ -31,9 +31,9 @@
     <style>
         .loading {
           position: absolute;
-          width: 30px;
-          height: 30px;
-          border: 2px solid #000;
+          width: 80px;
+          height: 80px;
+          border: 10px solid #000;
           border-top-color: rgba(0, 0, 0, 0.2);
           border-right-color: rgba(0, 0, 0, 0.2);
           border-bottom-color: rgba(0, 0, 0, 0.2);
@@ -60,14 +60,17 @@
   <link rel="manifest" href="manifest.json">
 </head>
 <body>
-<script src="flutter_bootstrap.js" async></script>
 <div class="loading"></div>
 <script>
-    var loadingView = document.querySelector('.loading')
-    window.addEventListener('flutter-first-frame', function () {
+    function endLoading() {
          loadingView.style.animationPlayState = "paused";
+         loadingView.style.display = "none";
          console.log('end loading');
-    });
+    }
+    var loadingView = document.querySelector('.loading')
+    window.addEventListener('flutter-first-frame', endLoading);
+    window.addEventListener('resize', endLoading);
 </script>
+<script src="flutter_bootstrap.js" async></script>
 </body>
 </html>
