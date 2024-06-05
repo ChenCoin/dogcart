@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:dogcart/view/title_text.dart';
 import 'package:flutter/material.dart';
 
 import '../content.dart';
@@ -108,58 +109,43 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget homePage() {
-    String title = Content.title;
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
+    return Stack(
+      alignment: AlignmentDirectional.topCenter,
       children: [
-        const Padding(padding: EdgeInsets.all(48)),
-        Stack(
-          alignment: Alignment.topCenter,
+        const Center(
+          child: Padding(
+            padding: EdgeInsets.only(top: 32),
+            child: TitleText(),
+          ),
+        ),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Text(
-              title,
-              style: TextStyle(
-                  fontSize: 84,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'pig',
-                  foreground: Paint()
-                    ..style = PaintingStyle.stroke
-                    ..strokeWidth = 12
-                    ..color = Colors.amber),
+            const Padding(padding: EdgeInsets.all(180)),
+            const Padding(padding: EdgeInsets.all(96)),
+            ElevatedButton(
+              onPressed: () => _onBtnTap(),
+              style: ButtonStyle(
+                  minimumSize: WidgetStateProperty.all(const Size(180, 54)),
+                  shape: WidgetStateProperty.all(RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(24))),
+                  backgroundColor: WidgetStateProperty.all(Colors.amber)),
+              child: const Text(
+                Content.startGame,
+                style: TextStyle(
+                  fontSize: 24,
+                  color: Colors.white,
+                ),
+              ),
             ),
-            Text(
-              title,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 84,
-                fontWeight: FontWeight.bold,
-                fontFamily: 'pig',
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text(
+                Content.theHighestScore(data.highestScore),
+                style: const TextStyle(color: Colors.white),
               ),
             ),
           ],
-        ),
-        const Padding(padding: EdgeInsets.all(96)),
-        ElevatedButton(
-          onPressed: () => _onBtnTap(),
-          style: ButtonStyle(
-              minimumSize: WidgetStateProperty.all(const Size(180, 54)),
-              shape: WidgetStateProperty.all(RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(24))),
-              backgroundColor: WidgetStateProperty.all(Colors.amber)),
-          child: const Text(
-            Content.startGame,
-            style: TextStyle(
-              fontSize: 24,
-              color: Colors.white,
-            ),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(16),
-          child: Text(
-            Content.theHighestScore(data.highestScore),
-            style: const TextStyle(color: Colors.white),
-          ),
         ),
       ],
     );
